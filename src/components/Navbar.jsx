@@ -5,13 +5,20 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo y nombre del hotel */}
-        <div className="navbar-brand">
+        <a 
+          href="#" 
+          className="navbar-brand"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        >
           <img 
-            src="/foto/logo2.png" 
+            src="/foto/logo3.png" 
             alt="Sintax Hotel Logo" 
             className="hotel-logo"
           />
-        </div>
+        </a>
 
         {/* Enlaces de navegación */}
         <div className="navbar-links">
