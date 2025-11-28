@@ -6,20 +6,11 @@ function Navbar() {
       <div className="navbar-container">
         {/* Logo y nombre del hotel */}
         <div className="navbar-brand">
-          <svg 
-            className="hotel-icon" 
-            width="32" 
-            height="32" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path 
-              d="M12 2L2 7V10H4V20H8V14H16V20H20V10H22V7L12 2Z" 
-              fill="#1a365d"
-            />
-          </svg>
-          <span className="brand-name">Syntax Hotel</span>
+          <img 
+            src="/foto/logo2.png" 
+            alt="Sintax Hotel Logo" 
+            className="hotel-logo"
+          />
         </div>
 
         {/* Enlaces de navegación */}

@@ -1,7 +1,7 @@
 .navbar {
   position: relative;
   width: 100%;
-  padding: 1.5rem 2rem;
+  padding: 0.5rem 2rem;
   background: linear-gradient(
     135deg,
     rgba(255, 200, 150, 0.3) 0%,
@@ -11,6 +11,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 1000;
+  overflow: visible;
 }
 
 .navbar-container {
@@ -20,27 +21,22 @@
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
+  overflow: visible;
 }
 
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   text-decoration: none;
+  overflow: visible;
 }
 
-.hotel-icon {
-  flex-shrink: 0;
-}
-
-.brand-name {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1a365d;
-  letter-spacing: -0.02em;
+.hotel-logo {
+  height: 150px;
+  width: auto;
+  object-fit: contain;
+  margin-top: -45px;
+  margin-bottom: -45px;
 }
 
 .navbar-links {
@@ -205,7 +201,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .navbar {
-    padding: 1rem 1.5rem;
+    padding: 0.5rem 1.5rem;
   }
 
   .navbar-container {
@@ -224,8 +220,8 @@
     font-size: 0.85rem;
   }
 
-  .brand-name {
-    font-size: 1.25rem;
+  .hotel-logo {
+    height: 65px;
   }
 
   .reserve-button {
