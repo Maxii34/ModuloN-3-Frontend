@@ -45,19 +45,7 @@ const DetalleHabitacion = () => {
         {/* Columna Derecha: Formulario de Reserva y Resumen */}
         <Col md={5}>
           <Card className="p-3">
-            <h3>Selecciona tus Fechas</h3>
-
-            {/* Campos de Fecha */}
-            <Row className="mt-3">
-              <Col>
-                <Form.Label>Check-in</Form.Label>
-                <Form.Control type="date" defaultValue="10/22/2024" />
-              </Col>
-              <Col>
-                <Form.Label>Check-out</Form.Label>
-                <Form.Control type="date" defaultValue="10/26/2024" />
-              </Col>
-            </Row>
+            <h3>Comprar</h3>
 
             {/* Resumen de Costos */}
             <div className="mt-4">
