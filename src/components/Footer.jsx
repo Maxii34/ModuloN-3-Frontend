@@ -70,7 +70,7 @@ function Footer() {
         {/* Separador y Copyright */}
         <div className="footer-separator"></div>
         <div className="footer-copyright">
-          <p>&copy; 2024 Sintax Hotel. Todos los derechos reservados.</p>
+          <p>&copy; 2025 Sintax Hotel. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
