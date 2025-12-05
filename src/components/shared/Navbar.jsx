@@ -1,15 +1,19 @@
+import { Link, useNavigate } from 'react-router';
 import '../../index.css'
 
+
 function Navbar() {
+  const navigate = useNavigate();
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo y nombre del hotel */}
-        <a 
-          href="#" 
+        <Link 
           className="navbar-brand"
           onClick={(e) => {
             e.preventDefault();
+            navigate('/');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         >
@@ -18,14 +22,14 @@ function Navbar() {
             alt="Sintax Hotel Logo" 
             className="hotel-logo"
           />
-        </a>
+        </Link>
 
         {/* Enlaces de navegación */}
         <div className="navbar-links">
-          <a href="#quienes-somos" className="nav-link">Quiénes somos</a>
-          <a href="#galeria" className="nav-link">Galería</a>
-          <a href="#habitaciones" className="nav-link">Habitaciones</a>
-          <a href="#contacto" className="nav-link">Contacto</a>
+          <Link to="/nosotros" className="nav-link">Quiénes somos</Link>
+          <Link to="/galeria" className="nav-link">Galería</Link>
+          <Link to="/habitaciones" className="nav-link">Habitaciones</Link>
+          <Link to="/contacto" className="nav-link">Contacto</Link>
         </div>
 
         {/* Botón de reserva */}
