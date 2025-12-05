@@ -2,6 +2,7 @@ import './index.css'
 import Navbar from './components/shared/Navbar'
 import Footer from './components/shared/Footer'
 import DetalleHabitacion from './components/pages/detalleHabitacion'
+import AdminHabitaciones from './components/pages/AdminHabitaciones'
 
 function App() {
 
@@ -9,7 +10,7 @@ function App() {
     <>
       <Navbar />
       <div>
-        <DetalleHabitacion/>
+        <AdminHabitaciones/>
       </div>
       <Footer />
       
