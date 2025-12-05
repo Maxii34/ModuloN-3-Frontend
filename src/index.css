@@ -490,3 +490,27 @@
   }
 }
 
+.card-room {
+  min-height: 420px;   /* Alto uniforme para las cards */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-room img {
+  height: 180px;       /* Alto fijo */
+  object-fit: cover;   /* Mantiene proporción */
+}
+
+.card-room .card-body {
+  flex: 1 1 auto;      /* Ocupa el espacio restante */
+}
+
+.btn-room {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+  padding: 6px 14px !important;
+  font-weight: 500 !important;
+}
