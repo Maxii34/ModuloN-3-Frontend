@@ -1,6 +1,8 @@
 import './index.css'
 import Navbar from './components/shared/Navbar'
 import Footer from './components/shared/Footer'
+import AdminHabitaciones from './components/pages/AdminHabitaciones'
+
 
 function App() {
 
@@ -8,6 +10,7 @@ function App() {
     <>
       <Navbar />
       <div>
+        <AdminHabitaciones/>
       </div>
       <Footer />
       
