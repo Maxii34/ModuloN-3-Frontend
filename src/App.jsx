@@ -1,7 +1,6 @@
 import './index.css'
 import Navbar from './components/shared/Navbar'
 import Footer from './components/shared/Footer'
-import ReservaHabitacion from './components/pages/ReservaHabitacion'
 
 function App() {
 
@@ -9,7 +8,6 @@ function App() {
     <>
       <Navbar />
       <div>
-        <ReservaHabitacion></ReservaHabitacion>
       </div>
       <Footer />
       
