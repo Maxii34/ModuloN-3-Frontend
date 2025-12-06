@@ -1,3 +1,8 @@
+
+import './index.css'
+import Navbar from './components/shared/Navbar'
+import Footer from './components/shared/Footer'
+import AdminHabitaciones from './components/pages/AdminHabitaciones'
 import "./index.css";
 import Navbar from "./components/shared/Navbar";
 import Footer from "./components/shared/Footer";
@@ -9,6 +14,7 @@ import { Galeria } from "./Components/pages/Galeria";
 import { Habitaciones } from "./Components/pages/Habitaciones";
 import { Contacto } from "./Components/pages/Contacto";
 import AdminHabitaciones from "./Components/pages/AdminHabitaciones";
+
 
 function App() {
   return (
