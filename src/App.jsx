@@ -3,17 +3,14 @@ import './index.css'
 import Navbar from './components/shared/Navbar'
 import Footer from './components/shared/Footer'
 import AdminHabitaciones from './components/pages/AdminHabitaciones'
-import "./index.css";
-import Navbar from "./components/shared/Navbar";
-import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/detalleHabitacion";
 import { BrowserRouter, Routes, Route } from "react-router";
-import { Inicio } from "./Components/pages/inicio";
-import { QuienesSomos } from "./Components/pages/QuienesSomos";
-import { Galeria } from "./Components/pages/Galeria";
+import { Inicio } from "./components/pages/inicio";
+import { QuienesSomos } from "./components/pages/QuienesSomos";
+import { Galeria } from "./components/pages/Galeria";
 import { Habitaciones } from "./Components/pages/Habitaciones";
-import { Contacto } from "./Components/pages/Contacto";
-import AdminHabitaciones from "./Components/pages/AdminHabitaciones";
+import { Contacto } from "./components/pages/Contacto";
+
 
 
 function App() {
