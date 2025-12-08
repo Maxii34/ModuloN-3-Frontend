@@ -1,8 +1,37 @@
 import { Container, Row, Col, Form, Card, Button } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "../../index.css"
+import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
 
 const AdminHabitaciones = () => {
+
+  const habitacionesEjemplo = [
+    {
+      id: 1,
+      numero: "101",
+      tipo: "Simple",
+      precio: 150,
+      estado: "Disponible",
+      img: "https://images.pexels.com/photos/34983175/pexels-photo-34983175.jpeg",
+    },
+    {
+      id: 2,
+      numero: "204",
+      tipo: "Doble",
+      precio: 220,
+      estado: "Ocupada",
+      img: "https://images.pexels.com/photos/276224/pexels-photo-276224.jpeg",
+    },
+    {
+      id: 3,
+      numero: "301",
+      tipo: "Suite",
+      precio: 350,
+      estado: "Mantenimiento",
+      img: "https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg",
+    },
+  ];
+
   return (
     <Container className="my-5">
       <Row className="gap-4">
@@ -66,77 +95,16 @@ const AdminHabitaciones = () => {
         </Col>
 
         {/* --- Columna Derecha: Habitaciones Existentes --- */}
-        <Col md={7} className="p-4 border rounded bg-white">
-          <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
+        
 
-          <Row className="g-4">
-            {/* Habitación ejemplo 1 */}
-            <Col md={6}>
-              <Card className="h-100 shadow-sm card-room">
-                <Card.Img
-                  variant="top"
-                  src="https://images.pexels.com/photos/34983175/pexels-photo-34983175.jpeg"
-                />
-                <Card.Body>
-                  <div className="d-flex justify-content-between">
-                    <Card.Title>Habitación 101</Card.Title>
-                    <span className="text-success fw-bold">Disponible</span>
-                  </div>
-                  <Card.Text>Simple</Card.Text>
-                  <Card.Text className="fw-bold">$150 / noche</Card.Text>
-                </Card.Body>
-                <Card.Footer className="d-flex justify-content-between">
-                  <Button variant="primary" className="btn-room"><i className="bi bi-pencil-fill"></i> Editar</Button>
-                  <Button variant="danger" className="btn-room"><i className="bi bi-trash-fill"></i> Eliminar</Button>
-                </Card.Footer>
-              </Card>
-            </Col>
+          
+            <Col md={7} className="p-4 border rounded bg-white">
+              <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
 
-            {/* Habitación ejemplo 2 */}
-            <Col md={6}>
-              <Card className="h-100 shadow-sm card-room">
-                <Card.Img
-                  variant="top"
-                  src="https://images.pexels.com/photos/276224/pexels-photo-276224.jpeg"
-                />
-                <Card.Body>
-                  <div className="d-flex justify-content-between">
-                    <Card.Title>Habitación 204</Card.Title>
-                    <span className="text-danger fw-bold">Ocupada</span>
-                  </div>
-                  <Card.Text>Doble</Card.Text>
-                  <Card.Text className="fw-bold">$220 / noche</Card.Text>
-                </Card.Body>
-                <Card.Footer className="d-flex justify-content-between">
-                  <Button variant="primary" className="btn-room"><i className="bi bi-pencil-fill"></i> Editar</Button>
-                  <Button variant="danger" className="btn-room"><i className="bi bi-trash-fill"></i> Eliminar</Button>
-                </Card.Footer>
-              </Card>
-            </Col>
+              <CardsHabitaciones habitaciones={habitacionesEjemplo} />
 
-            {/* Habitación ejemplo 3 */}
-            <Col md={6}>
-              <Card className="h-100 shadow-sm card-room">
-                <Card.Img
-                  variant="top"
-                  src="https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg"
-                />
-                <Card.Body>
-                  <div className="d-flex justify-content-between">
-                    <Card.Title>Habitación 301</Card.Title>
-                    <span className="text-warning fw-bold">Mantenimiento</span>
-                  </div>
-                  <Card.Text>Suite</Card.Text>
-                  <Card.Text className="fw-bold">$350 / noche</Card.Text>
-                </Card.Body>
-                <Card.Footer className="d-flex justify-content-between">
-                  <Button variant="primary" className="btn-room"><i className="bi bi-pencil-fill"></i> Editar</Button>
-                  <Button variant="danger" className="btn-room"><i className="bi bi-trash-fill"></i> Eliminar</Button>
-                </Card.Footer>
-              </Card>
-            </Col>
-          </Row>
-        </Col>
+          </Col>
+         
       </Row>
     </Container>
   );
