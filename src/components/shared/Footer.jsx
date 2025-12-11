@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import '../../index.css'
 
 
@@ -25,7 +26,7 @@ function Footer() {
           <div className="footer-column">
             <h4 className="footer-title">Navegación</h4>
             <nav className="footer-nav">
-              <a href="#quienes-somos" className="footer-link">Quiénes somos</a>
+              <Link to="/nosotros" className="footer-link">Quiénes somos</Link>
               <a href="#galeria" className="footer-link">Galería</a>
               <a href="#habitaciones" className="footer-link">Habitaciones</a>
               <a href="#contacto" className="footer-link">Contacto</a>
