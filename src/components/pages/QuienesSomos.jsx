@@ -1,4 +1,5 @@
 import { Container, Row, Col, Card } from "react-bootstrap";
+import { ContainerCard } from "../ui/ContainerCard";
 
 export const QuienesSomos = () => {
   return (
@@ -52,6 +53,7 @@ export const QuienesSomos = () => {
             </Row>
           </Card>
         </Container>
+        <ContainerCard />
       </section>
     </>
   );
