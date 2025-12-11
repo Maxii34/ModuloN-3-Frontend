@@ -1,6 +1,8 @@
 import './Rooms.css'
+import { Link, useNavigate } from 'react-router'
 
 function Rooms() {
+  const navigate = useNavigate()
   const rooms = [
     {
       image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
@@ -36,14 +38,19 @@ function Rooms() {
               <div className="room-content">
                 <h3 className="room-title">{room.title}</h3>
                 <p className="room-description">{room.description}</p>
-                <a href="#" className="room-link">Ver detalles</a>
+                <Link to="/habitaciones" className="room-link">Ver detalles</Link>
               </div>
             </div>
           ))}
         </div>
         
         <div className="rooms-button-wrapper">
-          <button className="rooms-button">Ver Todas las Habitaciones</button>
+          <button 
+            className="rooms-button"
+            onClick={() => navigate('/habitaciones')}
+          >
+            Ver Todas las Habitaciones
+          </button>
         </div>
       </div>
     </section>

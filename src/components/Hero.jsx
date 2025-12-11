@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import './Hero.css'
 
 function Hero() {
+  const navigate = useNavigate()
   const [checkInDate, setCheckInDate] = useState('')
   const [checkOutDate, setCheckOutDate] = useState('')
 
@@ -87,7 +89,12 @@ function Hero() {
             </div>
           </div>
           
-          <button className="booking-button">Ver Disponibilidad</button>
+          <button 
+            className="booking-button"
+            onClick={() => navigate('/habitaciones')}
+          >
+            Ver Disponibilidad
+          </button>
         </div>
       </div>
     </section>

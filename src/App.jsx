@@ -4,7 +4,7 @@ import AdminHabitaciones from './components/pages/AdminHabitaciones'
 import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/DetalleHabitacion";
 import { BrowserRouter, Routes, Route } from "react-router";
-import { Inicio } from "./components/pages/inicio";
+import { Inicio } from "./components/pages/Inicio";
 import { QuienesSomos } from "./components/pages/QuienesSomos";
 import { Galeria } from "./components/pages/Galeria";
 import Habitaciones  from "./components/pages/Habitaciones";
@@ -28,10 +28,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Menu 
-        loginShow={loginShow}
-        registerShow={registerShow}
-        />
+        <Menu />
         <main>
           <Routes>
             <Route path="/" element={<Inicio />} />
