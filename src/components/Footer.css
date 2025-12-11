@@ -187,14 +187,27 @@
   margin: 0;
 }
 
-/* Responsive */
+/* Responsive - Tablet */
 @media (max-width: 1024px) {
+  .footer {
+    padding: 2.5rem 1.5rem;
+  }
+
   .footer-content {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
+
+  .footer-logo-img {
+    height: 45px;
+  }
+
+  .footer-logo-text {
+    font-size: 1.35rem;
+  }
 }
 
+/* Responsive - Móvil */
 @media (max-width: 768px) {
   .footer {
     padding: 2rem 1.5rem;
@@ -208,10 +221,55 @@
   .footer-logo-container {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .footer-logo-img {
+    height: 40px;
+  }
+
+  .footer-logo-text {
+    font-size: 1.25rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .footer-title {
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-link {
+    font-size: 0.9rem;
+  }
+
+  .footer-contact-item {
+    font-size: 0.9rem;
   }
 
   .footer-social {
     justify-content: flex-start;
+    gap: 0.75rem;
+  }
+
+  .footer-social-link {
+    width: 38px;
+    height: 38px;
+  }
+
+  .footer-social-icon {
+    font-size: 1.1rem;
+  }
+
+  .footer-separator {
+    margin: 1.5rem 0 1rem 0;
+  }
+
+  .footer-copyright p {
+    font-size: 0.85rem;
   }
 }
 
@@ -220,12 +278,59 @@
     padding: 1.5rem 1rem;
   }
 
+  .footer-content {
+    gap: 1.5rem;
+  }
+
+  .footer-logo-img {
+    height: 35px;
+  }
+
   .footer-logo-text {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.85rem;
   }
 
   .footer-title {
     font-size: 1rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .footer-nav {
+    gap: 0.65rem;
+  }
+
+  .footer-link {
+    font-size: 0.85rem;
+  }
+
+  .footer-contact {
+    gap: 0.85rem;
+  }
+
+  .footer-contact-item {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .footer-icon {
+    font-size: 1rem;
+  }
+
+  .footer-social-link {
+    width: 36px;
+    height: 36px;
+  }
+
+  .footer-social-icon {
+    font-size: 1rem;
+  }
+
+  .footer-copyright p {
+    font-size: 0.8rem;
   }
 }
 

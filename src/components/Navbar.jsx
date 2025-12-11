@@ -1,6 +1,17 @@
+import { useState } from 'react'
 import './Navbar.css'
 
 function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const closeMenu = () => {
+    setIsMenuOpen(false)
+  }
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -11,6 +22,7 @@ function Navbar() {
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            closeMenu();
           }}
         >
           <img 
@@ -20,16 +32,40 @@ function Navbar() {
           />
         </a>
 
+        {/* Botón hamburguesa para móviles */}
+        <button 
+          className={`hamburger ${isMenuOpen ? 'active' : ''}`}
+          onClick={toggleMenu}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         {/* Enlaces de navegación */}
-        <div className="navbar-links">
-          <a href="#quienes-somos" className="nav-link">Quiénes somos</a>
-          <a href="#galeria" className="nav-link">Galería</a>
-          <a href="#habitaciones" className="nav-link">Habitaciones</a>
-          <a href="#contacto" className="nav-link">Contacto</a>
+        <div className={`navbar-links ${isMenuOpen ? 'active' : ''}`}>
+          <a href="#quienes-somos" className="nav-link" onClick={closeMenu}>Quiénes somos</a>
+          <a href="#galeria" className="nav-link" onClick={closeMenu}>Galería</a>
+          <a href="#habitaciones" className="nav-link" onClick={closeMenu}>Habitaciones</a>
+          <a href="#contacto" className="nav-link" onClick={closeMenu}>Contacto</a>
+          
+          {/* Botón de reserva en móvil */}
+          <button className="reserve-button blob-btn mobile" onClick={closeMenu}>
+            Reservar Ahora
+            <span className="blob-btn__inner">
+              <span className="blob-btn__blobs">
+                <span className="blob-btn__blob"></span>
+                <span className="blob-btn__blob"></span>
+                <span className="blob-btn__blob"></span>
+                <span className="blob-btn__blob"></span>
+              </span>
+            </span>
+          </button>
         </div>
 
-        {/* Botón de reserva */}
-        <button className="reserve-button blob-btn">
+        {/* Botón de reserva en desktop */}
+        <button className="reserve-button blob-btn desktop" onClick={closeMenu}>
           Reservar Ahora
           <span className="blob-btn__inner">
             <span className="blob-btn__blobs">
