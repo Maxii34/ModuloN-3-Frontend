@@ -1,36 +1,37 @@
 import { Col, Container, Row } from "react-bootstrap";
 import { CardsNosotros } from "./CardsNosotros";
+import Maxi from "../../assets/compressed-Maxi.jpeg";
+import Mariano from "../../assets/compressed-Mariano.jpeg";
+import Santiago from "../../assets/compressed-Santiago.jpeg";
+import Naim from "../../assets/compresse-naim.jpeg";
 
 export const ContainerCard = () => {
     const nosotros = [
   {
     id: 1,
     nombre: "Maximiliano Ordoñez",
-    imagen: "",
-    github: "",
-    linkedin: ""
+    imagen: Maxi,
+    github: "https://github.com/Maxii34",
   },
   {
     id: 2,
-    nombre: "",
-    imagen: "",
-    github: "",
-    linkedin: ""
+    nombre: "Mariano Juarez",
+    imagen: Mariano,
+    github: "https://github.com/santyago13",
   },
   {
     id: 3,
-    nombre: "",
-    imagen: "",
-    github: "",
-    linkedin: ""
+    nombre: "Santiago Robledo",
+    imagen: Santiago,
+    github: "https://github.com/SantiagoAnselmino",
   },
   {
-    id: 4, 
-    nombre: "",
-    imagen: "",
-    github: "",
-    linkedin: ""
-  }
+    id: 3,
+    nombre: "Naim Paz",
+    imagen: Naim,
+    github: "https://github.com/naimp074",
+  },
+
 ];
 
   return (

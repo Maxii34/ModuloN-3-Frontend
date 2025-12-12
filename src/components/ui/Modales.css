@@ -117,11 +117,67 @@
 
 /* Estilo para la imagen circular */
 .card-img-circle {
-    /* Define el ancho y alto iguales para garantizar un círculo */
-    width: 150px;
-    height: 150px;
-    /* Esto ayuda a asegurar que la imagen cubra el área sin distorsionarse */
+    width: 150px !important;
+    height: 150px !important;
+    min-width: 150px;
+    min-height: 150px;
+    max-width: 150px;
+    max-height: 150px;
     object-fit: cover;
-    /* Opcional: añade un margen inferior para separarlo del texto */
     margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50% !important;
+    display: block;
+}
+
+/*Boton GitHub*/
+
+/* From Uiverse.io by vinodjangid07 */ 
+.Btn {
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition-duration: .4s;
+  cursor: pointer;
+  position: relative;
+  background-color: rgb(31, 31, 31);
+  overflow: hidden;
+}
+
+.svgIcon {
+  transition-duration: .3s;
+}
+
+.svgIcon path {
+  fill: white;
+}
+
+.text {
+  position: absolute;
+  color: rgb(255, 255, 255);
+  width: 120px;
+  font-weight: 600;
+  opacity: 0;
+  transition-duration: .4s;
+}
+
+.Btn:hover {
+  width: 110px;
+  transition-duration: .4s;
+  border-radius: 30px;
+}
+
+.Btn:hover .text {
+  opacity: 1;
+  transition-duration: .4s;
+}
+
+.Btn:hover .svgIcon {
+  opacity: 0;
+  transition-duration: .3s;
 }

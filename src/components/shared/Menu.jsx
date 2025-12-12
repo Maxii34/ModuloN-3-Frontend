@@ -56,7 +56,7 @@ const Menu = ({ loginShow, registerShow }) => {
               </Nav.Link>
             </Nav>
 
-            <div className=" d-flex justify-content-center align-content-center ">
+            <div className="d-flex justify-content-center align-items-center">
               {/* Botón Iniciar Sesión */}
               <button className="reserve-button blob-btn" onClick={abrirLogin}>
                 Iniciar Sesión
