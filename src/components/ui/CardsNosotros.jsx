@@ -15,7 +15,7 @@ export const CardsNosotros = ({ nts }) => {
           <Card.Title className="text-center mb-3">{nts.nombre}</Card.Title>
           <div className="py-2">
           <a href={nts.github} target="_blank" rel="noopener noreferrer">
-            <button class="Btn shadow-lg">
+            <button className="Btn shadow-lg">
               <svg
                 class="svgIcon"
                 viewBox="0 0 496 512"

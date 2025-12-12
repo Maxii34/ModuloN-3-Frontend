@@ -38,7 +38,7 @@ export const QuienesSomos = () => {
                     <h5 className="mb-1 text-primary">
                       Nuestra Promesa Sintax
                     </h5>
-                    <p className="mb-0">
+                    <p className="mb-1">
                       "Eficiencia en cada proceso. Confort en cada rincón. El
                       diseño funcional de Sintax garantiza tu tranquilidad."
                     </p>
