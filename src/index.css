@@ -576,3 +576,25 @@ a {
   padding: 6px 14px !important;
   font-weight: 500 !important;
 }
+
+.css-quienes-somos .card {
+  border: none; 
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.css-quienes-somos .card:hover {
+  transform: translateY(-3px); 
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+}
+.css-quienes-somos .card-body {
+    padding: 24px;
+}
+
+.promesa-destacada {
+  margin-top: 20px;
+  border-left: 4px solid #007bff; 
+  padding-left: 15px;
+  font-style: italic;
+  color: #555; 
+}

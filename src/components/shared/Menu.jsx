@@ -4,8 +4,16 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import "../../index.css";
 
-const Menu = () => {
+const Menu = ({ loginShow, registerShow }) => {
   const navigate = useNavigate();
+
+  const abrirLogin = () => {
+    loginShow();
+  };
+  
+  const abrirRegister = () => {
+    registerShow();
+  };
 
   return (
     <>
@@ -48,7 +56,33 @@ const Menu = () => {
               </Nav.Link>
             </Nav>
 
-            <div className=" d-flex justify-content-center align-content-center ">
+            <div className="d-flex justify-content-center align-items-center">
+              {/* Botón Iniciar Sesión */}
+              <button className="reserve-button blob-btn" onClick={abrirLogin}>
+                Iniciar Sesión
+                <span className="blob-btn__inner">
+                  <span className="blob-btn__blobs">
+                    <span className="blob-btn__blob"></span>
+                    <span className="blob-btn__blob"></span>
+                    <span className="blob-btn__blob"></span>
+                    <span className="blob-btn__blob"></span>
+                  </span>
+                </span>
+              </button>
+              
+              {/* Botón Registrarse */}
+              <button className="mx-1 reserve-button blob-btn" onClick={abrirRegister}>
+                Registrarse
+                <span className="blob-btn__inner">
+                  <span className="blob-btn__blobs">
+                    <span className="blob-btn__blob"></span>
+                    <span className="blob-btn__blob"></span>
+                    <span className="blob-btn__blob"></span>
+                    <span className="blob-btn__blob"></span>
+                  </span>
+                </span>
+              </button>
+              
               {/* Botón de reserva */}
               <button 
                 className="reserve-button blob-btn"

@@ -28,7 +28,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Menu />
+        <Menu  loginShow={loginShow} registerShow={registerShow}/>
         <main>
           <Routes>
             <Route path="/" element={<Inicio />} />
