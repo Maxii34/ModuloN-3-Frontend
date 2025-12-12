@@ -1,8 +1,14 @@
-import { Link } from 'react-router';
 import '../../index.css'
-
+import { Link, useNavigate } from 'react-router'
 
 function Footer() {
+  const navigate = useNavigate()
+
+  const handleNavClick = (path) => {
+    navigate(path)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -26,10 +32,21 @@ function Footer() {
           <div className="footer-column">
             <h4 className="footer-title">Navegación</h4>
             <nav className="footer-nav">
-              <Link to="/nosotros" className="footer-link">Quiénes somos</Link>
-              <a href="#galeria" className="footer-link">Galería</a>
-              <a href="#habitaciones" className="footer-link">Habitaciones</a>
-              <a href="#contacto" className="footer-link">Contacto</a>
+              <Link to="/" className="footer-link" onClick={() => handleNavClick('/')}>
+                Inicio
+              </Link>
+              <Link to="/nosotros" className="footer-link" onClick={() => handleNavClick('/nosotros')}>
+                Quiénes somos
+              </Link>
+              <Link to="/galeria" className="footer-link" onClick={() => handleNavClick('/galeria')}>
+                Galería
+              </Link>
+              <Link to="/habitaciones" className="footer-link" onClick={() => handleNavClick('/habitaciones')}>
+                Habitaciones
+              </Link>
+              <Link to="/contacto" className="footer-link" onClick={() => handleNavClick('/contacto')}>
+                Contacto
+              </Link>
             </nav>
           </div>
 

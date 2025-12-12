@@ -10,9 +10,10 @@ const Menu = ({ loginShow, registerShow }) => {
   const abrirLogin = () => {
     loginShow();
   };
+  
   const abrirRegister = () => {
     registerShow();
-  }
+  };
 
   return (
     <>
@@ -56,6 +57,7 @@ const Menu = ({ loginShow, registerShow }) => {
             </Nav>
 
             <div className=" d-flex justify-content-center align-content-center ">
+              {/* Botón Iniciar Sesión */}
               <button className="reserve-button blob-btn" onClick={abrirLogin}>
                 Iniciar Sesión
                 <span className="blob-btn__inner">
@@ -67,8 +69,10 @@ const Menu = ({ loginShow, registerShow }) => {
                   </span>
                 </span>
               </button>
+              
+              {/* Botón Registrarse */}
               <button className="mx-1 reserve-button blob-btn" onClick={abrirRegister}>
-                Registrase
+                Registrarse
                 <span className="blob-btn__inner">
                   <span className="blob-btn__blobs">
                     <span className="blob-btn__blob"></span>
@@ -78,8 +82,12 @@ const Menu = ({ loginShow, registerShow }) => {
                   </span>
                 </span>
               </button>
+              
               {/* Botón de reserva */}
-              <button className="reserve-button blob-btn">
+              <button 
+                className="reserve-button blob-btn"
+                onClick={() => navigate('/habitaciones')}
+              >
                 Reservar Ahora
                 <span className="blob-btn__inner">
                   <span className="blob-btn__blobs">

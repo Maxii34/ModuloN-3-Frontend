@@ -34,43 +34,116 @@ const AdminHabitaciones = () => {
 
   return (
     <Container className="my-5">
-      <Row className="gap-4">
-        {/* --- Columna Izquierda: Nueva Habitación --- */}
+      <Row className="gap-4 justify-content-center">
+        {/* --- Columna Izquierda: Nueva Habitación (Añadido/Modificado) --- */}
         <Col md={4} className="p-4 border rounded bg-light">
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
 
           <Form>
-            {/* Número de Habitación */}
+            {/* Número de Habitación (type="number" para validar min/max) */}
             <Form.Group className="mb-3">
               <Form.Label>Número de Habitación</Form.Label>
-              <Form.Control type="text" placeholder="Ej: 101" />
+              <Form.Control 
+                type="number" 
+                placeholder="Ej: 101" 
+                min={1} 
+                max={1000} 
+              />
+              <Form.Text className="text-muted">
+                Debe ser un número único entre 1 y 1000.
+              </Form.Text>
             </Form.Group>
 
-            {/* Tipo de Habitacion */}
+            {/* Tipo de Habitacion (Ajustado a los valores del enum) */}
             <Form.Group className="mb-3">
               <Form.Label>Tipo de Habitación</Form.Label>
-              <Form.Select>
-                <option>Seleccionar tipo</option>
-                <option>Simple</option>
-                <option>Doble</option>
-                <option>Matrimonial</option>
-                <option>Suite</option>
+              <Form.Select defaultValue="default">
+                <option value="default" disabled>Seleccionar tipo</option>
+                <option value="individual">Individual</option>
+                <option value="doble">Doble</option>
+                <option value="matrimonial">Matrimonial</option>
+                <option value="suite">Suite</option>
+                <option value="familiar">Familiar</option> 
               </Form.Select>
             </Form.Group>
 
             {/* Precio */}
             <Form.Group className="mb-3">
-              <Form.Label>Precio por Noche</Form.Label>
-              <Form.Control type="number" placeholder="$ 150.00" />
+              <Form.Label>Precio por Noche ($)</Form.Label>
+              <Form.Control 
+                type="number" 
+                placeholder="Ej: 150.00" 
+                min={0} 
+              />
             </Form.Group>
 
-            {/* Disponibilidad */}
+            {/* Capacidad */}
+            <Form.Group className="mb-3">
+              <Form.Label>Capacidad (N° de Huéspedes)</Form.Label>
+              <Form.Control 
+                type="number" 
+                placeholder="Ej: 2" 
+                min={1} 
+              />
+            </Form.Group>
+            
+            {/* Piso */}
+            <Form.Group className="mb-3">
+              <Form.Label>Piso</Form.Label>
+              <Form.Control 
+                type="number" 
+                placeholder="Ej: 3" 
+                min={0} 
+                max={500} 
+              />
+            </Form.Group>
+            
+            {/* Metros Cuadrados */}
+            <Form.Group className="mb-3">
+              <Form.Label>Metros Cuadrados</Form.Label>
+              <Form.Control 
+                type="number" 
+                placeholder="Ej: 25" 
+                min={0} 
+                max={600} 
+              />
+            </Form.Group>
+
+            {/* Características */}
+            <Form.Group className="mb-3">
+              <Form.Label>Características Clave</Form.Label>
+              <Form.Control 
+                type="text" 
+                placeholder="Ej: Vista al mar, Balcón, Smart TV" 
+                minLength={2} 
+                maxLength={50} 
+              />
+              <Form.Text className="text-muted">
+                Palabras clave separadas por comas.
+              </Form.Text>
+            </Form.Group>
+
+            {/* Descripción */}
+            <Form.Group className="mb-3">
+              <Form.Label>Descripción Detallada</Form.Label>
+              <Form.Control 
+                as="textarea" 
+                rows={3} 
+                placeholder="Detalles sobre el diseño, mobiliario y comodidades." 
+                minLength={10} 
+                maxLength={500} 
+              />
+            </Form.Group>
+            
+            {/* Disponibilidad  */}
             <Form.Group className="mb-3">
               <Form.Label>Disponibilidad</Form.Label>
-              <div className="d-flex gap-3 mt-2">
-                <Form.Check type="radio" label="Disponible" name="estado" />
-                <Form.Check type="radio" label="Ocupada" name="estado" />
-                <Form.Check type="radio" label="Mantenimiento" name="estado" />
+              <div className="d-flex flex-wrap gap-3 mt-2">
+                <Form.Check type="radio" label="Disponible" name="estado" id="estado-disponible" value="disponible" defaultChecked />
+                <Form.Check type="radio" label="Ocupada" name="estado" id="estado-ocupada" value="ocupada" />
+                <Form.Check type="radio" label="Reservada" name="estado" id="estado-reservada" value="reservada" />
+                <Form.Check type="radio" label="Limpieza" name="estado" id="estado-limpieza" value="limpieza" />
+                <Form.Check type="radio" label="Mantenimiento" name="estado" id="estado-mantenimiento" value="mantenimiento" />
               </div>
             </Form.Group>
 
@@ -80,31 +153,34 @@ const AdminHabitaciones = () => {
               <div
                 className="border rounded d-flex justify-content-center align-items-center text-center p-4"
                 style={{ borderStyle: "dashed", cursor: "pointer" }}
+                onClick={() => document.getElementById('file-upload').click()} // Simula el click en el input oculto
               >
                 <div>
                   <p className="mb-0 fw-semibold">Click para subir o arrastrar</p>
                   <small>SVG, PNG, JPG (MAX. 800×400px)</small>
+                  <Form.Control type="file" id="file-upload" className="d-none" accept=".svg,.png,.jpg,.jpeg" />
                 </div>
               </div>
+              <Form.Text className="text-muted">
+                Se espera una URL de imagen válida para el modelo final.
+              </Form.Text>
             </Form.Group>
 
-            <Button variant="primary" className="w-100">
+            <Button variant="primary" type="submit" className="w-100">
               Guardar Habitación
             </Button>
           </Form>
         </Col>
 
-        {/* --- Columna Derecha: Habitaciones Existentes --- */}
-        
-
-          
-            <Col md={7} className="p-4 border rounded bg-white">
-              <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
-
+        {/* Columna Derecha: Habitaciones Existentes */}
+        <Col md={7} className="p-4 border rounded bg-white">
+          <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
+          {habitacionesEjemplo ? (
               <CardsHabitaciones habitaciones={habitacionesEjemplo} />
-
-          </Col>
-         
+          ) : (
+              <p className="text-muted">Cargando habitaciones o 'CardsHabitaciones' no disponible.</p>
+          )}
+        </Col>
       </Row>
     </Container>
   );
