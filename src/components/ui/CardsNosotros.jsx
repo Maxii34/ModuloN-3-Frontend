@@ -4,7 +4,7 @@ import "./Modales.css";
 export const CardsNosotros = ({ nts }) => {
   return (
     <>
-      <Card style={{ width: "14rem" }}>
+      <Card className="card-nosotros">
         <Card.Img
           variant="top"
           src={nts.imagen}

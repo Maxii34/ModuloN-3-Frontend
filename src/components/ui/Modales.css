@@ -108,6 +108,19 @@
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
+.card-nosotros {
+    /* Mantenemos el ancho para desktop */
+    width: 250px; 
+    min-width: 200px;
+    max-width: 100%;
+    height: auto; 
+    border-radius: 15px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
 /* Estilo para la imagen circular */
 .card-img-circle {
     width: 150px !important;
@@ -122,6 +135,12 @@
     margin-right: auto;
     border-radius: 50% !important;
     display: block;
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; 
+}
+
+.card-img-circle:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); 
+    transform: scale(1.03);
 }
 
 /*Boton GitHub*/

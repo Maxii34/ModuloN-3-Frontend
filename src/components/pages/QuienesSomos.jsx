@@ -17,7 +17,7 @@ export const QuienesSomos = () => {
                 />
               </Col>
               <Col md={6}>
-                <Card.Body>
+                <Card.Body className="p-0 px-3 pt-1">
                   <Card.Title>
                     {" "}
                     <strong>Sintax Hotel</strong>{" "}
@@ -50,7 +50,7 @@ export const QuienesSomos = () => {
           <div className="">
             <div>
             <h4 className=" display-5 text-center my-3">
-              nuestro equipo de trabajo
+              Conose nuestro equipo de trabajo
             </h4>
             </div>
             <ContainerCard />

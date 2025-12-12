@@ -26,7 +26,7 @@ export const ContainerCard = () => {
     github: "https://github.com/SantiagoAnselmino",
   },
   {
-    id: 3,
+    id: 4,
     nombre: "Naim Paz",
     imagen: Naim,
     github: "https://github.com/naimp074",
@@ -36,10 +36,10 @@ export const ContainerCard = () => {
 
   return (
     <>
-      <Container className="mt-5">
-        <Row className="d-flex justify-content-center align-content-center">
+      <Container className="mt-5 g-2 p-0 d-flex justify-content-center">
+        <Row className="d-flex justify-content- justify-content-md-center align-content-center w-100">
             {nosotros.map((nts, index) =>
-          <Col xs={12} sm={12} md={4} lg={3} key={index} className="p-0 m-0">
+          <Col xs={12} sm={12} md={4} lg={3} key={index} className="p-0 m-0 d-flex justify-content-center mb-3">
             <CardsNosotros nts={nts}  />
           </Col>
             )}
