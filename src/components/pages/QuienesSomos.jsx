@@ -4,7 +4,7 @@ import { ContainerCard } from "../ui/ContainerCard";
 export const QuienesSomos = () => {
   return (
     <>
-      <section className="mt-4 mb-4 css-quienes-somos">
+      <section className="mt-4 mb-4 css-quienes-somos d-flex justify-content-center">
         <Container>
           <Card>
             <Row className="g-0">
@@ -23,23 +23,18 @@ export const QuienesSomos = () => {
                     <strong>Sintax Hotel</strong>{" "}
                   </Card.Title>
                   <Card.Text>
-                    Bienvenido a Sintax Hotel, el punto de encuentro perfecto
-                    entre la tecnología de vanguardia y la calidez de nuestro
-                    servicio. Hemos estructurado una experiencia de alojamiento
-                    inigualable, donde cada detalle está diseñado para ofrecerte
-                    el máximo confort y una estancia impecable. Descubre nuestro
-                    diseño inteligente y nuestra hospitalidad de primer nivel,
-                    ideal para viajes de negocios o placer.
+                    Más que una estructura, <strong>Sintax Hotel</strong> es una
+                    declaración de diseño y funcionalidad. Nacimos de la visión
+                    de crear un oasis urbano donde el ritmo de la ciudad se
+                    equilibra con la serenidad impecable. Nuestro propósito es
+                    ser el refugio que nuestros huéspedes necesitan: un lugar
+                    donde la arquitectura inteligente y los detalles de lujo se
+                    combinan para crear una atmósfera de paz y eficiencia.
+                    Elegir Sintax es elegir la tranquilidad de saber que cada
+                    aspecto de tu estancia ha sido diseñado para tu éxito y tu
+                    descanso. Somos el motor de tu siguiente gran día.
                   </Card.Text>
-                  <div
-                    style={{
-                      marginTop: "20px",
-                      borderLeft: "4px solid #007bff",
-                      paddingLeft: "15px",
-                      fontStyle: "italic",
-                      color: "#555",
-                    }}
-                  >
+                  <div className="promesa-destacada">
                     <h5 className="mb-1 text-primary">
                       Nuestra Promesa Sintax
                     </h5>
@@ -52,8 +47,15 @@ export const QuienesSomos = () => {
               </Col>
             </Row>
           </Card>
+          <div className="">
+            <div>
+            <h4 className=" display-5 text-center my-3">
+              nuestro equipo de trabajo
+            </h4>
+            </div>
+            <ContainerCard />
+          </div>
         </Container>
-        <ContainerCard />
       </section>
     </>
   );

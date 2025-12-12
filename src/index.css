@@ -590,3 +590,11 @@ a {
 .css-quienes-somos .card-body {
     padding: 24px;
 }
+
+.promesa-destacada {
+  margin-top: 20px;
+  border-left: 4px solid #007bff; 
+  padding-left: 15px;
+  font-style: italic;
+  color: #555; 
+}

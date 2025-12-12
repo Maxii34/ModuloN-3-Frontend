@@ -97,21 +97,14 @@
 
 /* Estilo base de la tarjeta */
 .card {
-    /* Establece una transición suave para todos los cambios */
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    /* Opcional: Asegura que el borde no se vea cortado al hacer el hover */
     overflow: hidden;
-    /* Estilo de sombra inicial sutil */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    /* Opcional: bordes redondeados */
     border-radius: 10px;
 }
 
-/* Efecto hover: lo que sucede cuando el ratón pasa por encima */
 .card:hover {
-    /* 1. La tarjeta se eleva 5 píxeles */
     transform: translateY(-5px);
-    /* 2. La sombra se hace más visible, dando un efecto "flotante" */
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
@@ -133,7 +126,6 @@
 
 /*Boton GitHub*/
 
-/* From Uiverse.io by vinodjangid07 */ 
 .Btn {
   border: none;
   border-radius: 50%;
