@@ -1,9 +1,18 @@
-import { Container, Row, Col, Form, Card, Button } from "react-bootstrap";
-import "bootstrap-icons/font/bootstrap-icons.css"
-import "../../index.css"
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
 
 const AdminHabitaciones = () => {
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm();
 
   const habitacionesEjemplo = [
     {
@@ -32,155 +41,210 @@ const AdminHabitaciones = () => {
     },
   ];
 
+  const onSubmit = (data) => {
+    console.log("Datos validados:", data);
+
+    Swal.fire({
+      title: "Habitación guardada",
+      text: "Los datos se han registrado correctamente",
+      icon: "success"
+    });
+
+    reset();
+  };
+
   return (
     <Container className="my-5">
       <Row className="gap-4 justify-content-center">
-        {/* --- Columna Izquierda: Nueva Habitación (Añadido/Modificado) --- */}
+
+        {/* --------------------------------------
+            COLUMNA IZQUIERDA: FORMULARIO
+        --------------------------------------- */}
         <Col md={4} className="p-4 border rounded bg-light">
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
 
-          <Form>
-            {/* Número de Habitación (type="number" para validar min/max) */}
+          <Form onSubmit={handleSubmit(onSubmit)}>
+
+            {/* Número */}
             <Form.Group className="mb-3">
               <Form.Label>Número de Habitación</Form.Label>
-              <Form.Control 
-                type="number" 
-                placeholder="Ej: 101" 
-                min={1} 
-                max={1000} 
+              <Form.Control
+                type="number"
+                placeholder="Ej: 101"
+                {...register("numero", {
+                  required: "El número de habitación es obligatorio",
+                  min: { value: 1, message: "Debe ser mayor o igual a 1" },
+                  max: { value: 500, message: "Debe ser menor o igual a 500" }
+                })}
               />
-              <Form.Text className="text-muted">
-                Debe ser un número único entre 1 y 1000.
-              </Form.Text>
+              <Form.Text className="text-danger">{errors.numero?.message}</Form.Text>
             </Form.Group>
 
-            {/* Tipo de Habitacion (Ajustado a los valores del enum) */}
+            {/* Tipo */}
             <Form.Group className="mb-3">
               <Form.Label>Tipo de Habitación</Form.Label>
-              <Form.Select defaultValue="default">
-                <option value="default" disabled>Seleccionar tipo</option>
+              <Form.Select
+                {...register("tipo", { required: "Debe seleccionar un tipo de habitación" })}
+              >
+                <option value="">Seleccionar tipo</option>
                 <option value="individual">Individual</option>
                 <option value="doble">Doble</option>
                 <option value="matrimonial">Matrimonial</option>
                 <option value="suite">Suite</option>
-                <option value="familiar">Familiar</option> 
+                <option value="familiar">Familiar</option>
               </Form.Select>
+              <Form.Text className="text-danger">{errors.tipo?.message}</Form.Text>
             </Form.Group>
 
             {/* Precio */}
             <Form.Group className="mb-3">
               <Form.Label>Precio por Noche ($)</Form.Label>
-              <Form.Control 
-                type="number" 
-                placeholder="Ej: 150.00" 
-                min={0} 
+              <Form.Control
+                type="number"
+                placeholder="Ej: 150"
+                {...register("precio", {
+                  required: "El precio es obligatorio",
+                  min: { value: 1, message: "Debe ser mayor que 0" },
+                  max: { value: 200000, message: "Máximo permitido: $200.000" }
+                })}
               />
+              <Form.Text className="text-danger">{errors.precio?.message}</Form.Text>
             </Form.Group>
 
             {/* Capacidad */}
             <Form.Group className="mb-3">
-              <Form.Label>Capacidad (N° de Huéspedes)</Form.Label>
-              <Form.Control 
-                type="number" 
-                placeholder="Ej: 2" 
-                min={1} 
+              <Form.Label>Capacidad (Huéspedes)</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Ej: 2"
+                {...register("capacidad", {
+                  required: "La capacidad es obligatoria",
+                  min: { value: 1, message: "Mínimo 1 huésped" },
+                  max: { value: 10, message: "Máximo 10 huéspedes" },
+                })}
               />
+              <Form.Text className="text-danger">{errors.capacidad?.message}</Form.Text>
             </Form.Group>
-            
+
             {/* Piso */}
             <Form.Group className="mb-3">
               <Form.Label>Piso</Form.Label>
-              <Form.Control 
-                type="number" 
-                placeholder="Ej: 3" 
-                min={0} 
-                max={500} 
+              <Form.Control
+                type="number"
+                placeholder="Ej: 3"
+                {...register("piso", {
+                  required: "El piso es obligatorio",
+                  min: { value: 0, message: "Debe ser al menos 0" },
+                  max: { value: 15, message: "Máximo piso permitido: 15" },
+                })}
               />
+              <Form.Text className="text-danger">{errors.piso?.message}</Form.Text>
             </Form.Group>
-            
-            {/* Metros Cuadrados */}
+
+            {/* Metros */}
             <Form.Group className="mb-3">
               <Form.Label>Metros Cuadrados</Form.Label>
-              <Form.Control 
-                type="number" 
-                placeholder="Ej: 25" 
-                min={0} 
-                max={600} 
+              <Form.Control
+                type="number"
+                placeholder="Ej: 25"
+                {...register("metros", {
+                  required: "Los metros cuadrados son obligatorios",
+                  min: { value: 5, message: "Mínimo 5 m2" },
+                  max: { value: 200, message: "Máximo 200 m2" },
+                })}
               />
+              <Form.Text className="text-danger">{errors.metros?.message}</Form.Text>
             </Form.Group>
 
             {/* Características */}
             <Form.Group className="mb-3">
               <Form.Label>Características Clave</Form.Label>
-              <Form.Control 
-                type="text" 
-                placeholder="Ej: Vista al mar, Balcón, Smart TV" 
-                minLength={2} 
-                maxLength={50} 
+              <Form.Control
+                type="text"
+                placeholder="Ej: Balcón, Smart TV"
+                {...register("caracteristicas", {
+                  required: "Las características son obligatorias",
+                  minLength: { value: 2, message: "Mínimo 2 caracteres" },
+                  maxLength: { value: 80, message: "Máximo 80 caracteres" },
+                })}
               />
-              <Form.Text className="text-muted">
-                Palabras clave separadas por comas.
-              </Form.Text>
+              <Form.Text className="text-danger">{errors.caracteristicas?.message}</Form.Text>
             </Form.Group>
 
             {/* Descripción */}
             <Form.Group className="mb-3">
               <Form.Label>Descripción Detallada</Form.Label>
-              <Form.Control 
-                as="textarea" 
-                rows={3} 
-                placeholder="Detalles sobre el diseño, mobiliario y comodidades." 
-                minLength={10} 
-                maxLength={500} 
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Describe la habitación..."
+                {...register("descripcion", {
+                  required: "La descripción es obligatoria",
+                  minLength: { value: 10, message: "Debe tener al menos 10 caracteres" },
+                  maxLength: { value: 500, message: "Máximo 500 caracteres" },
+                })}
               />
-            </Form.Group>
-            
-            {/* Disponibilidad  */}
-            <Form.Group className="mb-3">
-              <Form.Label>Disponibilidad</Form.Label>
-              <div className="d-flex flex-wrap gap-3 mt-2">
-                <Form.Check type="radio" label="Disponible" name="estado" id="estado-disponible" value="disponible" defaultChecked />
-                <Form.Check type="radio" label="Ocupada" name="estado" id="estado-ocupada" value="ocupada" />
-                <Form.Check type="radio" label="Reservada" name="estado" id="estado-reservada" value="reservada" />
-                <Form.Check type="radio" label="Limpieza" name="estado" id="estado-limpieza" value="limpieza" />
-                <Form.Check type="radio" label="Mantenimiento" name="estado" id="estado-mantenimiento" value="mantenimiento" />
-              </div>
+              <Form.Text className="text-danger">{errors.descripcion?.message}</Form.Text>
             </Form.Group>
 
-            {/* Cargar imagen */}
-            <Form.Group className="mb-4">
-              <Form.Label>Foto de la Habitación</Form.Label>
-              <div
-                className="border rounded d-flex justify-content-center align-items-center text-center p-4"
-                style={{ borderStyle: "dashed", cursor: "pointer" }}
-                onClick={() => document.getElementById('file-upload').click()} // Simula el click en el input oculto
-              >
-                <div>
-                  <p className="mb-0 fw-semibold">Click para subir o arrastrar</p>
-                  <small>SVG, PNG, JPG (MAX. 800×400px)</small>
-                  <Form.Control type="file" id="file-upload" className="d-none" accept=".svg,.png,.jpg,.jpeg" />
-                </div>
+            {/* Estado */}
+            <Form.Group className="mb-3">
+              <Form.Label>Estado</Form.Label>
+              <div className="d-flex flex-wrap gap-3 mt-2">
+                {["disponible", "ocupada", "reservada", "limpieza", "mantenimiento"].map(
+                  (estado) => (
+                    <Form.Check
+                      type="radio"
+                      key={estado}
+                      label={estado.charAt(0).toUpperCase() + estado.slice(1)}
+                      value={estado}
+                      {...register("estado", {
+                        required: "Debe seleccionar un estado",
+                      })}
+                    />
+                  )
+                )}
               </div>
-              <Form.Text className="text-muted">
-                Se espera una URL de imagen válida para el modelo final.
-              </Form.Text>
+              <Form.Text className="text-danger">{errors.estado?.message}</Form.Text>
+            </Form.Group>
+
+            {/* Imagen */}
+            <Form.Group className="mb-4">
+              <Form.Label>Foto de la Habitación (URL)</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Ej: https://example.com/habitacion.jpg"
+                {...register("imagen", {
+                  required: "Debe proporcionar una imagen",
+                  pattern: {
+                    value: /(https?:\/\/.*\.(?:png|jpg|jpeg|webp|svg))/i,
+                    message: "Debe ser una URL válida de imagen",
+                  },
+                })}
+              />
+              <Form.Text className="text-danger">{errors.imagen?.message}</Form.Text>
             </Form.Group>
 
             <Button variant="primary" type="submit" className="w-100">
               Guardar Habitación
             </Button>
+
           </Form>
         </Col>
 
-        {/* Columna Derecha: Habitaciones Existentes */}
+        {/* --------------------------------------
+            COLUMNA DERECHA: LISTADO
+        --------------------------------------- */}
         <Col md={7} className="p-4 border rounded bg-white">
           <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
+
           {habitacionesEjemplo ? (
-              <CardsHabitaciones habitaciones={habitacionesEjemplo} />
+            <CardsHabitaciones habitaciones={habitacionesEjemplo} />
           ) : (
-              <p className="text-muted">Cargando habitaciones o 'CardsHabitaciones' no disponible.</p>
+            <p className="text-muted">Cargando habitaciones...</p>
           )}
         </Col>
+
       </Row>
     </Container>
   );
