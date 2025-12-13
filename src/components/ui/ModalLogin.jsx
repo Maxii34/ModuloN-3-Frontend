@@ -1,8 +1,9 @@
 import { Button, Modal, Form } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router";
 
-export const ModalLogin = ({ showLogin, loginClose }) => {
+export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
   const {
     register,
     handleSubmit,
@@ -10,9 +11,14 @@ export const ModalLogin = ({ showLogin, loginClose }) => {
     formState: { errors },
   } = useForm();
 
+const RegistrateAki = () => {
+  registerShow();
+  loginClose();
+}
+
   const onSubmi = (data) => {
     console.log(data);
-    //Agregar logica de login.
+    //Agregar logica de login. 
     reset();
   };
 
@@ -66,6 +72,13 @@ export const ModalLogin = ({ showLogin, loginClose }) => {
                 <span className="text-danger">{errors.password.message}</span>
               )}
             </Form.Group>
+
+            <div className="text-center mt-3 mb-3">
+              <span className="text-muted">¿Aún no tienes cuenta? </span>
+              <Link onClick={RegistrateAki} className="text-primary text-decoration-none fw-semibold">
+                Regístrate aquí
+              </Link>
+            </div>
 
             <Button variant="primary" type="submit" className="w-100">
               Iniciar Sesión

@@ -44,6 +44,7 @@ function App() {
         <ModalLogin 
         showLogin={showLogin}
         loginClose={loginClose}
+        registerShow={registerShow}
         />
         <ModalRegister 
         showRegister={showRegister}
