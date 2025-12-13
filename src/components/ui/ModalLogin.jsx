@@ -11,22 +11,21 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
     formState: { errors },
   } = useForm();
 
-const RegistrateAki = () => {
-  registerShow();
-  loginClose();
-}
+  const RegistrateAki = () => {
+    registerShow();
+    loginClose();
+  };
 
   const onSubmi = (data) => {
     console.log(data);
-    //Agregar logica de login. 
+    //Agregar logica de login.
     reset();
   };
-
 
   return (
     <>
       <Modal show={showLogin} onHide={loginClose}>
-        <Modal.Body>
+        <Modal.Body className="">
           <Form className=" css-modal-login" onSubmit={handleSubmit(onSubmi)}>
             <div className="text-center mb-2">
               <h1 className="mb-2">Bienvenido</h1>
@@ -75,7 +74,10 @@ const RegistrateAki = () => {
 
             <div className="text-center mt-3 mb-3">
               <span className="text-muted">¿Aún no tienes cuenta? </span>
-              <Link onClick={RegistrateAki} className="text-primary text-decoration-none fw-semibold">
+              <Link
+                onClick={RegistrateAki}
+                className="text-primary text-decoration-none fw-semibold"
+              >
                 Regístrate aquí
               </Link>
             </div>

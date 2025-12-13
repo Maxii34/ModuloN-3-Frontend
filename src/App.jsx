@@ -49,6 +49,7 @@ function App() {
         <ModalRegister 
         showRegister={showRegister}
         registerClose={registerClose}
+        loginShow={loginShow}
         />
       </BrowserRouter>
     </>

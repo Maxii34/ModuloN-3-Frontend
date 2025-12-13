@@ -1,14 +1,20 @@
 import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router";
 
-export const ModalRegister = ({ showRegister, registerClose }) => {
+export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
+
+  const iniciarSesion = () => {
+    loginShow();
+    registerClose();
+  };
 
   const onSubmi = (data) => {
     console.log(data);
@@ -150,11 +156,23 @@ export const ModalRegister = ({ showRegister, registerClose }) => {
                     })}
                   />
                   {errors.password && (
-                    <span className="text-danger">{errors.password.message}</span>
+                    <span className="text-danger">
+                      {errors.password.message}
+                    </span>
                   )}
                 </Form.Group>
               </Col>
             </Row>
+
+            <div className="text-center mt-3 mb-3">
+              <span className="text-muted">¿Si ya tienes cuenta? </span>
+              <Link
+                onClick={iniciarSesion}
+                className="text-primary text-decoration-none fw-semibold"
+              >
+                Inicia sesion
+              </Link>
+            </div>
 
             <div className=" d-flex justify-content-center align-content-center">
               <Button variant="primary" type="submit" className="w-50">

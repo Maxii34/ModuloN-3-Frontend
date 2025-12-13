@@ -192,3 +192,13 @@
   opacity: 0;
   transition-duration: .3s;
 }
+
+/* Evitar el padding-right cuando se abre el modal */
+body.modal-open {
+  padding-right: 0 !important;
+}
+
+/* Mantener el overflow hidden para evitar scroll de fondo */
+body.modal-open {
+  overflow: hidden;
+}
