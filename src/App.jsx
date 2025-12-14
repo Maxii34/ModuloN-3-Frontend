@@ -9,13 +9,15 @@ import { Galeria } from "./components/pages/Galeria";
 import Habitaciones from "./components/pages/Habitaciones";
 import { Contacto } from "./components/pages/Contacto";
 import Menu from "./components/shared/Menu";
+import AdminNavbar from "./components/shared/AdminNavbar";
 import { ModalLogin } from "./components/ui/ModalLogin";
 import { ModalRegister } from "./components/ui/ModalRegister";
 import { useState } from "react";
 import Error404 from "./components/pages/Error404";
 import AdminUsuarios from "./components/pages/AdminUsuarios";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-function App() {
+function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
   const loginClose = () => setShowLogin(false);
   const loginShow = () => setShowLogin(true);
@@ -24,24 +26,45 @@ function App() {
   const registerClose = () => setShowRegister(false);
   const registerShow = () => setShowRegister(true);
 
+  const { isAdmin, logoutAdmin } = useAuth();
+
   return (
     <>
       <BrowserRouter>
-        <Menu loginShow={loginShow} registerShow={registerShow} />
-        <main>
-          <Routes>
-            <Route path="/" element={<Inicio />} />
-            <Route path="/detalle" element={<DetalleHabitacion />} />
-            <Route path="/nosotros" element={<QuienesSomos />} />
-            <Route path="/galeria" element={<Galeria />} />
-            <Route path="/habitaciones" element={<Habitaciones />} />
-            <Route path="/contacto" element={<Contacto />} />
-            <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
-            <Route path="/admin-usuarios" element={<AdminUsuarios />} />
-            <Route path="/*" element={<Error404 />} />
-          </Routes>
-        </main>
-        <Footer />
+        {isAdmin ? (
+          <>
+            <AdminNavbar onLogout={logoutAdmin} />
+            <div className="admin-layout">
+              <main>
+                <Routes>
+                  <Route path="/admin-dashboard" element={<AdminHabitaciones />} />
+                  <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
+                  <Route path="/admin-usuarios" element={<AdminUsuarios />} />
+                  <Route path="/admin-reservas" element={<AdminHabitaciones />} />
+                  <Route path="/*" element={<AdminHabitaciones />} />
+                </Routes>
+              </main>
+            </div>
+          </>
+        ) : (
+          <>
+            <Menu loginShow={loginShow} registerShow={registerShow} />
+            <main>
+              <Routes>
+                <Route path="/" element={<Inicio />} />
+                <Route path="/detalle" element={<DetalleHabitacion />} />
+                <Route path="/nosotros" element={<QuienesSomos />} />
+                <Route path="/galeria" element={<Galeria />} />
+                <Route path="/habitaciones" element={<Habitaciones />} />
+                <Route path="/contacto" element={<Contacto />} />
+                <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
+                <Route path="/admin-usuarios" element={<AdminUsuarios />} />
+                <Route path="/*" element={<Error404 />} />
+              </Routes>
+            </main>
+            <Footer />
+          </>
+        )}
         <ModalLogin 
         showLogin={showLogin}
         loginClose={loginClose}
@@ -54,6 +77,14 @@ function App() {
         />
       </BrowserRouter>
     </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
