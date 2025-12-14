@@ -33,7 +33,7 @@ const AdminNavbar = ({ onLogout }) => {
         <div className="admin-navbar-logo">
           <FaShoppingBag className="logo-icon" />
         </div>
-        <h1 className="admin-navbar-title">Hotel Lux</h1>
+        <h1 className="admin-navbar-title">Sintax Hotel</h1>
         <p className="admin-navbar-subtitle">Admin Panel</p>
       </div>
 
