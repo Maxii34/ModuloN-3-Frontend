@@ -26,14 +26,19 @@
 
 .logo-icon {
   font-size: 2.5rem;
-  color: #1a4d7a;
+  color: #ffffff;
   background-color: #1a4d7a;
-  padding: 0.5rem;
-  border-radius: 8px;
+  padding: 0.75rem;
+  border-radius: 10px;
+  display: block;
 }
 
-.logo-icon path {
-  fill: #ffffff;
+.admin-navbar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
 .admin-navbar-title {
