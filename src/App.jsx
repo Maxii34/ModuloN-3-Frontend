@@ -27,6 +27,35 @@ function AppContent() {
   const registerShow = () => setShowRegister(true);
 
   const { isAdmin, logoutAdmin } = useAuth();
+
+  return (
+    <>
+      <BrowserRouter>
+        <AppRouter 
+          isAdmin={isAdmin}
+          logoutAdmin={logoutAdmin}
+          loginShow={loginShow}
+          registerShow={registerShow}
+          showLogin={showLogin}
+          loginClose={loginClose}
+          registerClose={registerClose}
+          showRegister={showRegister}
+        />
+      </BrowserRouter>
+    </>
+  );
+}
+
+function AppRouter({ 
+  isAdmin, 
+  logoutAdmin, 
+  loginShow, 
+  registerShow,
+  showLogin,
+  loginClose,
+  registerClose,
+  showRegister
+}) {
   const location = useLocation();
   
   // Para pruebas: mostrar navbar admin si está en rutas de admin
@@ -35,50 +64,48 @@ function AppContent() {
 
   return (
     <>
-      <BrowserRouter>
-        {shouldShowAdminNavbar ? (
-          <>
-            <AdminNavbar onLogout={logoutAdmin} />
-            <div className="admin-layout">
-              <main>
-                <Routes>
-                  <Route path="/admin-dashboard" element={<AdminHabitaciones />} />
-                  <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
-                  <Route path="/admin-usuarios" element={<AdminUsuarios />} />
-                  <Route path="/admin-reservas" element={<AdminHabitaciones />} />
-                  <Route path="/*" element={<AdminHabitaciones />} />
-                </Routes>
-              </main>
-            </div>
-          </>
-        ) : (
-          <>
-            <Menu loginShow={loginShow} registerShow={registerShow} />
+      {shouldShowAdminNavbar ? (
+        <>
+          <AdminNavbar onLogout={logoutAdmin} />
+          <div className="admin-layout">
             <main>
               <Routes>
-                <Route path="/" element={<Inicio />} />
-                <Route path="/detalle" element={<DetalleHabitacion />} />
-                <Route path="/nosotros" element={<QuienesSomos />} />
-                <Route path="/galeria" element={<Galeria />} />
-                <Route path="/habitaciones" element={<Habitaciones />} />
-                <Route path="/contacto" element={<Contacto />} />
-                <Route path="/*" element={<Error404 />} />
+                <Route path="/admin-dashboard" element={<AdminHabitaciones />} />
+                <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
+                <Route path="/admin-usuarios" element={<AdminUsuarios />} />
+                <Route path="/admin-reservas" element={<AdminHabitaciones />} />
+                <Route path="/*" element={<AdminHabitaciones />} />
               </Routes>
             </main>
-            <Footer />
-          </>
-        )}
-        <ModalLogin 
+          </div>
+        </>
+      ) : (
+        <>
+          <Menu loginShow={loginShow} registerShow={registerShow} />
+          <main>
+            <Routes>
+              <Route path="/" element={<Inicio />} />
+              <Route path="/detalle" element={<DetalleHabitacion />} />
+              <Route path="/nosotros" element={<QuienesSomos />} />
+              <Route path="/galeria" element={<Galeria />} />
+              <Route path="/habitaciones" element={<Habitaciones />} />
+              <Route path="/contacto" element={<Contacto />} />
+              <Route path="/*" element={<Error404 />} />
+            </Routes>
+          </main>
+          <Footer />
+        </>
+      )}
+      <ModalLogin 
         showLogin={showLogin}
         loginClose={loginClose}
         registerShow={registerShow}
-        />
-        <ModalRegister 
+      />
+      <ModalRegister 
         showRegister={showRegister}
         registerClose={registerClose}
         loginShow={loginShow}
-        />
-      </BrowserRouter>
+      />
     </>
   );
 }
