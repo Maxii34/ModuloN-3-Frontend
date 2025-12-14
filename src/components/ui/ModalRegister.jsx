@@ -1,7 +1,27 @@
 import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import "./Modales.css";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router";
 
-export const ModalRegister = ({ showRegister, registerClose }) => {
+export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const iniciarSesion = () => {
+    loginShow();
+    registerClose();
+  };
+
+  const onSubmi = (data) => {
+    console.log(data);
+    //Agregar logica de login.
+    reset();
+  };
+
   return (
     <>
       <Modal show={showRegister} onHide={registerClose} size="lg">
@@ -13,19 +33,55 @@ export const ModalRegister = ({ showRegister, registerClose }) => {
             </span>
           </div>
 
-          <Form className="css-modal-register">
+          <Form className="css-modal-register" onSubmit={handleSubmit(onSubmi)}>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Nombre</Form.Label>
-                  <Form.Control type="text" placeholder="Ingresa tu nombre" />
+                  <Form.Control
+                    type="text"
+                    placeholder="Ingresa tu nombre"
+                    {...register("nombre", {
+                      required: "El nombre es requerido",
+                      minLength: {
+                        value: 3,
+                        message: "El nombre debe tener al menos 3 caracteres",
+                      },
+                      maxLength: {
+                        value: 50,
+                        message: "El nombre no puede exceder 50 caracteres",
+                      },
+                    })}
+                  />
+                  {errors.nombre && (
+                    <span className="text-danger">{errors.nombre.message}</span>
+                  )}
                 </Form.Group>
               </Col>
 
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Apellido</Form.Label>
-                  <Form.Control type="text" placeholder="Ingresa tu apellido" />
+                  <Form.Control
+                    type="text"
+                    placeholder="Ingresa tu apellido"
+                    {...register("apellido", {
+                      required: "El apellido es requerido",
+                      minLength: {
+                        value: 3,
+                        message: "El apellido debe tener al menos 3 caracteres",
+                      },
+                      maxLength: {
+                        value: 50,
+                        message: "El apellido no puede exceder 50 caracteres",
+                      },
+                    })}
+                  />
+                  {errors.apellido && (
+                    <span className="text-danger">
+                      {errors.apellido.message}
+                    </span>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
@@ -34,14 +90,51 @@ export const ModalRegister = ({ showRegister, registerClose }) => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Email</Form.Label>
-                  <Form.Control type="email" placeholder="ejemplo@Email.com" />
+                  <Form.Control
+                    type="email"
+                    placeholder="ejemplo@Email.com"
+                    {...register("email", {
+                      required: "El email es requerido",
+                      pattern: {
+                        value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "El email no es válido",
+                      },
+                    })}
+                  />
+                  {errors.email && (
+                    <span className="text-danger">{errors.email.message}</span>
+                  )}
                 </Form.Group>
               </Col>
 
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Teléfono</Form.Label>
-                  <Form.Control type="tel" placeholder="Ingresa tu teléfono" />
+                  <Form.Control
+                    type="tel"
+                    placeholder="Ingresa tu teléfono"
+                    {...register("telefono", {
+                      required: "El teléfono es requerido",
+                      minLength: {
+                        value: 10,
+                        message: "El teléfono debe tener al menos 10 dígitos",
+                      },
+                      maxLength: {
+                        value: 15,
+                        message: "El teléfono no puede exceder 15 dígitos",
+                      },
+                      pattern: {
+                        value: /^[0-9+\-\s()]*$/,
+                        message:
+                          "El teléfono solo puede contener números y símbolos válidos",
+                      },
+                    })}
+                  />
+                  {errors.telefono && (
+                    <span className="text-danger">
+                      {errors.telefono.message}
+                    </span>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
@@ -53,15 +146,38 @@ export const ModalRegister = ({ showRegister, registerClose }) => {
                   <Form.Control
                     type="password"
                     placeholder="Ingresa tu contraseña"
+                    {...register("password", {
+                      required: "El password es requerido",
+                      pattern: {
+                        value:
+                          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.])[A-Za-z\d@$!%*?&#.]{8,}$/,
+                        message: "El password no es válido",
+                      },
+                    })}
                   />
+                  {errors.password && (
+                    <span className="text-danger">
+                      {errors.password.message}
+                    </span>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
-            
+
+            <div className="text-center mt-3 mb-3">
+              <span className="text-muted">¿Si ya tienes cuenta? </span>
+              <Link
+                onClick={iniciarSesion}
+                className="text-primary text-decoration-none fw-semibold"
+              >
+                Inicia sesion
+              </Link>
+            </div>
+
             <div className=" d-flex justify-content-center align-content-center">
-            <Button variant="primary" type="submit" className="w-50">
-              Registrarse
-            </Button>
+              <Button variant="primary" type="submit" className="w-50">
+                Registrarse
+              </Button>
             </div>
           </Form>
         </Modal.Body>

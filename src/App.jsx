@@ -40,10 +40,15 @@ function App() {
           </Routes>
         </main>
         <Footer />
-        <ModalLogin showLogin={showLogin} loginClose={loginClose} />
-        <ModalRegister
-          showRegister={showRegister}
-          registerClose={registerClose}
+        <ModalLogin 
+        showLogin={showLogin}
+        loginClose={loginClose}
+        registerShow={registerShow}
+        />
+        <ModalRegister 
+        showRegister={showRegister}
+        registerClose={registerClose}
+        loginShow={loginShow}
         />
       </BrowserRouter>
     </>
