@@ -1,7 +1,10 @@
 import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { iniciarSesion, registrarUsuario } from "../helpers/queries";
+import Swal from "sweetalert2";
+
 
 export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
   const {
@@ -11,15 +14,44 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
     formState: { errors },
   } = useForm();
 
-  const iniciarSesion = () => {
+  const navigate = useNavigate();
+
+  const iniciar = () => {
     loginShow();
     registerClose();
   };
 
-  const onSubmi = (data) => {
+  const onSubmi = async (data) => {
     console.log(data);
     //Agregar logica de login.
+    const nuevoUsuario = {
+      nombre: data.nombre,
+      apellido: data.apellido,
+      email: data.email,
+      telefono: data.telefono,
+      password: data.password,
+      tipo: "usuario"
+    }
+    
+
+    const respuesta = await registrarUsuario(nuevoUsuario);
+    if (!respuesta || !respuesta.ok) {
+      const datos = await respuesta.json();
+      return Swal.fire({
+      title: "Ocurrió un error",
+      text: datos?.mensaje || datos?.error || "No se pudo completar el registro.",
+      icon: "error",
+    });
+    }
+
+    const datos = await respuesta.json();
+    Swal.fire({
+    title: "Bienvenido",
+    text: "Te registraste correctamente.",
+    icon: "success",
+  });
     reset();
+    navigate("/");
   };
 
   return (
@@ -167,7 +199,7 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
             <div className="text-center mt-3 mb-3">
               <span className="text-muted">¿Si ya tienes cuenta? </span>
               <Link
-                onClick={iniciarSesion}
+                onClick={iniciar}
                 className="text-primary text-decoration-none fw-semibold"
               >
                 Inicia sesion
