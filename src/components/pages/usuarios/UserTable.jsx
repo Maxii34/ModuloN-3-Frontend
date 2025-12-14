@@ -12,7 +12,6 @@ const UserTable = ({ usuarios }) => {
           <th>Nombre de Usuario</th>
           <th>Email</th>
           <th>Rol</th>
-          <th>Estado</th>
           <th className="text-end">Acciones</th>
         </tr>
       </thead>
@@ -22,7 +21,7 @@ const UserTable = ({ usuarios }) => {
           usuarios.map((u) => <UserRow key={u.id} usuario={u} />)
         ) : (
           <tr>
-            <td colSpan="6" className="text-center text-muted py-4">
+            <td colSpan="5" className="text-center text-muted py-4">
               No hay usuarios para mostrar
             </td>
           </tr>
