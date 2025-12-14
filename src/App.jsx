@@ -2,7 +2,7 @@ import "./index.css";
 import AdminHabitaciones from "./components/pages/AdminHabitaciones";
 import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/DetalleHabitacion";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router";
 import { Inicio } from "./components/pages/Inicio";
 import { QuienesSomos } from "./components/pages/QuienesSomos";
 import { Galeria } from "./components/pages/Galeria";
@@ -27,11 +27,16 @@ function AppContent() {
   const registerShow = () => setShowRegister(true);
 
   const { isAdmin, logoutAdmin } = useAuth();
+  const location = useLocation();
+  
+  // Para pruebas: mostrar navbar admin si está en rutas de admin
+  const isAdminRoute = location.pathname.startsWith("/admin-");
+  const shouldShowAdminNavbar = isAdmin || isAdminRoute;
 
   return (
     <>
       <BrowserRouter>
-        {isAdmin ? (
+        {shouldShowAdminNavbar ? (
           <>
             <AdminNavbar onLogout={logoutAdmin} />
             <div className="admin-layout">
@@ -57,8 +62,6 @@ function AppContent() {
                 <Route path="/galeria" element={<Galeria />} />
                 <Route path="/habitaciones" element={<Habitaciones />} />
                 <Route path="/contacto" element={<Contacto />} />
-                <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
-                <Route path="/admin-usuarios" element={<AdminUsuarios />} />
                 <Route path="/*" element={<Error404 />} />
               </Routes>
             </main>
