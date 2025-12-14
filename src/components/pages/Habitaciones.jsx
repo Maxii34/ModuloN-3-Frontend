@@ -15,12 +15,12 @@ const Habitaciones = () => {
 
    const habitacionesEjemplo = [
     {
-      id: 1,
-      numero: "101",
-      tipo: "Simple",
-      precio: 150,
-      estado: "Disponible",
-      img: "https://images.pexels.com/photos/34983175/pexels-photo-34983175.jpeg",
+      id: "693de3cfd89428695754a63f",
+      numero: "10",
+      tipo: "matrimonial",
+      precio: 15000,
+      estado: "disponible",
+      img: "https://images.pexels.com/photos/34989794/pexels-photo-34989794.jpeg",
     },
     {
       id: 2,
