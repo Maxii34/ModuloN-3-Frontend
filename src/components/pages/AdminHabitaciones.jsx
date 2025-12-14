@@ -102,7 +102,7 @@ const AdminHabitaciones = () => {
             );
           }
         } catch (error) {
-          console.log("Error de red:", error);
+          console.error("Error de red:", error);
           Swal.fire("Error", "Fallo de conexión con el servidor.", "error");
         }
       }
