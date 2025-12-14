@@ -1,7 +1,8 @@
 import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
 
 export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
   const {
@@ -10,6 +11,8 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
     reset,
     formState: { errors },
   } = useForm();
+  const { loginAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const iniciarSesion = () => {
     loginShow();
@@ -18,7 +21,20 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
 
   const onSubmi = (data) => {
     console.log(data);
-    //Agregar logica de login.
+    // Si el tipo de usuario es admin, activar el estado de admin
+    if (data.tipoUsuario === "admin") {
+      loginAdmin({
+        nombre: data.nombre,
+        apellido: data.apellido,
+        email: data.email,
+        tipo: "admin",
+      });
+      registerClose();
+      navigate("/admin-dashboard");
+    } else {
+      // Lógica para usuario normal
+      console.log("Usuario normal registrado");
+    }
     reset();
   };
 
@@ -158,6 +174,28 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
                   {errors.password && (
                     <span className="text-danger">
                       {errors.password.message}
+                    </span>
+                  )}
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="justify-content-center">
+              <Col md={10}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Tipo de Usuario</Form.Label>
+                  <Form.Select
+                    {...register("tipoUsuario", {
+                      required: "Debes seleccionar un tipo de usuario",
+                    })}
+                  >
+                    <option value="">Selecciona un tipo</option>
+                    <option value="usuario">Usuario</option>
+                    <option value="admin">Administrador</option>
+                  </Form.Select>
+                  {errors.tipoUsuario && (
+                    <span className="text-danger">
+                      {errors.tipoUsuario.message}
                     </span>
                   )}
                 </Form.Group>

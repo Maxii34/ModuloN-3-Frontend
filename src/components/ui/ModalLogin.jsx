@@ -1,7 +1,8 @@
 import { Button, Modal, Form } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../../context/AuthContext";
 
 export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
   const {
@@ -10,6 +11,8 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
     reset,
     formState: { errors },
   } = useForm();
+  const { loginAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const RegistrateAki = () => {
     registerShow();
@@ -18,7 +21,19 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
 
   const onSubmi = (data) => {
     console.log(data);
-    //Agregar logica de login.
+    // Si el email contiene "admin", activar el estado de admin
+    // En producción, esto debería venir del backend
+    if (data.email.toLowerCase().includes("admin")) {
+      loginAdmin({
+        email: data.email,
+        tipo: "admin",
+      });
+      loginClose();
+      navigate("/admin-dashboard");
+    } else {
+      // Lógica para usuario normal
+      console.log("Usuario normal inició sesión");
+    }
     reset();
   };
 
