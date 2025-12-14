@@ -13,6 +13,7 @@ import { ModalLogin } from "./components/ui/ModalLogin";
 import { ModalRegister } from "./components/ui/ModalRegister";
 import { useState } from "react";
 import Error404 from "./components/pages/Error404";
+import AdminUsuarios from "./components/pages/AdminUsuarios";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -36,6 +37,7 @@ function App() {
             <Route path="/habitaciones" element={<Habitaciones />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
+            <Route path="/admin-usuarios" element={<AdminUsuarios />} />
             <Route path="/*" element={<Error404 />} />
           </Routes>
         </main>
