@@ -1,11 +1,12 @@
 import { Card, Button, Col, Row } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-const CardsHabitaciones = ({ habitaciones }) => {
+// 1. AQUI AGREGAMOS "borrarHabitacion" PARA RECIBIR LA FUNCION DEL PADRE
+const CardsHabitaciones = ({ habitaciones, borrarHabitacion }) => {
   return (
     <Row className="g-4">
       {habitaciones.map((hab) => (
-        <Col md={6} key={hab.id}>
+        <Col md={6} key={hab._id || hab.id}> 
           <Card className="h-100 shadow-sm card-room">
             <Card.Img variant="top" src={hab.img} />
 
@@ -35,9 +36,17 @@ const CardsHabitaciones = ({ habitaciones }) => {
               <Button variant="primary" className="btn-room">
                 <i className="bi bi-pencil-fill"></i> Editar
               </Button>
-              <Button variant="danger" className="btn-room">
+              
+              {/* 2. AQUI CONECTAMOS EL BOTON CON LA FUNCION */}
+              {/* Usamos una función flecha para pasar el ID específico */}
+              <Button 
+                variant="danger" 
+                className="btn-room"
+                onClick={() => borrarHabitacion(hab._id || hab.id)}
+              >
                 <i className="bi bi-trash-fill"></i> Eliminar
               </Button>
+
             </Card.Footer>
           </Card>
         </Col>
