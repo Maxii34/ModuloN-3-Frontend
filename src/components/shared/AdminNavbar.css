@@ -22,6 +22,7 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 .logo-icon {
@@ -31,14 +32,6 @@
   padding: 0.75rem;
   border-radius: 10px;
   display: block;
-}
-
-.admin-navbar-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
-  width: 100%;
 }
 
 .admin-navbar-title {
