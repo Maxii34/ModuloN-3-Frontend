@@ -11,7 +11,7 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
     reset,
     formState: { errors },
   } = useForm();
-  const { loginAdmin } = useAuth();
+  const { loginAdmin, loginUser } = useAuth();
   const navigate = useNavigate();
 
   const RegistrateAki = () => {
@@ -32,7 +32,12 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
       navigate("/admin-dashboard");
     } else {
       // Lógica para usuario normal
-      console.log("Usuario normal inició sesión");
+      loginUser({
+        email: data.email,
+        tipo: "usuario",
+      });
+      loginClose();
+      navigate("/");
     }
     reset();
   };

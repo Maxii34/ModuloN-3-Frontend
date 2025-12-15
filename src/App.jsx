@@ -16,6 +16,8 @@ import { useState } from "react";
 import Error404 from "./components/pages/Error404";
 import AdminUsuarios from "./components/pages/AdminUsuarios";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedAdminRoute from "./components/auth/ProtectedAdminRoute";
+import ProtectedUserRoute from "./components/auth/ProtectedUserRoute";
 
 function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
@@ -58,9 +60,9 @@ function AppRouter({
 }) {
   const location = useLocation();
   
-  // Para pruebas: mostrar navbar admin si está en rutas de admin
+  // Mostrar navbar admin solo si está autenticado como admin
   const isAdminRoute = location.pathname.startsWith("/admin-");
-  const shouldShowAdminNavbar = isAdmin || isAdminRoute;
+  const shouldShowAdminNavbar = isAdmin && isAdminRoute;
 
   return (
     <>
@@ -70,11 +72,39 @@ function AppRouter({
           <div className="admin-layout">
             <main>
               <Routes>
-                <Route path="/admin-dashboard" element={<AdminHabitaciones />} />
-                <Route path="/admin-habitaciones" element={<AdminHabitaciones />} />
-                <Route path="/admin-usuarios" element={<AdminUsuarios />} />
-                <Route path="/admin-reservas" element={<AdminHabitaciones />} />
-                <Route path="/*" element={<AdminHabitaciones />} />
+                <Route 
+                  path="/admin-dashboard" 
+                  element={
+                    <ProtectedAdminRoute>
+                      <AdminHabitaciones />
+                    </ProtectedAdminRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin-habitaciones" 
+                  element={
+                    <ProtectedAdminRoute>
+                      <AdminHabitaciones />
+                    </ProtectedAdminRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin-usuarios" 
+                  element={
+                    <ProtectedAdminRoute>
+                      <AdminUsuarios />
+                    </ProtectedAdminRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin-reservas" 
+                  element={
+                    <ProtectedAdminRoute>
+                      <AdminHabitaciones />
+                    </ProtectedAdminRoute>
+                  } 
+                />
+                <Route path="/*" element={<Error404 />} />
               </Routes>
             </main>
           </div>
@@ -85,7 +115,14 @@ function AppRouter({
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
-              <Route path="/detalle" element={<DetalleHabitacion />} />
+              <Route 
+                path="/detalle" 
+                element={
+                  <ProtectedUserRoute>
+                    <DetalleHabitacion />
+                  </ProtectedUserRoute>
+                } 
+              />
               <Route path="/nosotros" element={<QuienesSomos />} />
               <Route path="/galeria" element={<Galeria />} />
               <Route path="/habitaciones" element={<Habitaciones />} />
