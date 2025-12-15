@@ -1,12 +1,20 @@
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
-import { useState, useEffect } from "react";
+import ModalEditarHabitacion from "../ui/ModalEditarHabitacion";
+import { obtenerHabitaciones, crearHabitacion, eliminarHabitacion } from "../../services/habitacionesAPI";
 
 const AdminHabitaciones = () => {
+  const [habitaciones, setHabitaciones] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+  const [showModalEditar, setShowModalEditar] = useState(false);
+  const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
+
   const {
     register,
     handleSubmit,
@@ -14,35 +22,110 @@ const AdminHabitaciones = () => {
     formState: { errors },
   } = useForm();
 
-  const [habitaciones, setHabitaciones] = useState([]);
-
-  useEffect(() => {
-    obtenerHabitaciones();
-  }, []);
-
-  const obtenerHabitaciones = async () => {
+  // Función para cargar las habitaciones del backend
+  const cargarHabitaciones = async () => {
     try {
-      // Petición al Backend
-      const respuesta = await fetch("http://localhost:3000/api/habitaciones");
-      const datos = await respuesta.json();
-      console.log("Datos del Backend:", datos);
-      // Guardamos los datos REALES en el estado
+      setCargando(true);
+      setError(null);
+      const datos = await obtenerHabitaciones();
       setHabitaciones(datos);
-    } catch (error) {
-      console.error("Error al cargar habitaciones:", error);
+    } catch (err) {
+      console.error("Error al cargar habitaciones:", err);
+      setError("No se pudieron cargar las habitaciones. Verifica que el servidor esté ejecutándose.");
+    } finally {
+      setCargando(false);
     }
   };
 
-  const onSubmit = (data) => {
-    console.log("Datos validados:", data);
+  // Cargar habitaciones al montar el componente
+  useEffect(() => {
+    cargarHabitaciones();
+  }, []);
 
-    Swal.fire({
-      title: "Habitación guardada",
-      text: "Los datos se han registrado correctamente",
-      icon: "success",
+  // Manejar edición de habitación
+  const handleEditarHabitacion = (habitacion) => {
+    setHabitacionSeleccionada(habitacion);
+    setShowModalEditar(true);
+  };
+
+  // Callback después de editar
+  const handleHabitacionEditada = () => {
+    cargarHabitaciones();
+  };
+
+  // Manejar eliminación de habitación
+  const handleEliminarHabitacion = async (habitacion) => {
+    const resultado = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: `Se eliminará la habitación ${habitacion.numero}. Esta acción no se puede deshacer.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
     });
 
-    reset();
+    if (resultado.isConfirmed) {
+      try {
+        const id = habitacion._id || habitacion.id;
+        await eliminarHabitacion(id);
+
+        Swal.fire({
+          title: "¡Eliminada!",
+          text: "La habitación ha sido eliminada correctamente.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        cargarHabitaciones(); // Recargar la lista
+      } catch (error) {
+        Swal.fire({
+          title: "Error",
+          text: error.message || "No se pudo eliminar la habitación",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        });
+      }
+    }
+  };
+
+  // Crear nueva habitación
+  const onSubmit = async (data) => {
+    try {
+      // Asegurar que tipo y estado estén en minúsculas como espera el backend
+      const datosFormateados = {
+        ...data,
+        tipo: data.tipo?.toLowerCase(),
+        estado: data.estado?.toLowerCase(),
+        numero: Number(data.numero),
+        precio: Number(data.precio),
+        capacidad: Number(data.capacidad),
+        piso: Number(data.piso),
+        metros: Number(data.metros),
+      };
+      
+      await crearHabitacion(datosFormateados);
+
+      Swal.fire({
+        title: "¡Habitación guardada!",
+        text: "Los datos se han registrado correctamente",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      reset();
+      cargarHabitaciones(); // Recargar la lista
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message || "No se pudo crear la habitación",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+    }
   };
 
   const borrarHabitacion = (id) => {
@@ -308,17 +391,51 @@ const AdminHabitaciones = () => {
         --------------------------------------- */}
         <Col md={7} className="p-4 border rounded bg-white">
           <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
-          {/* CORRECCIÓN: Usamos 'habitaciones' en lugar de 'habitacionesEjemplo' */}
-          {habitaciones.length > 0 ? (
-            <CardsHabitaciones
-              habitaciones={habitaciones}
-              borrarHabitacion={borrarHabitacion}
-            />
+
+          {cargando ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3 text-muted">Cargando habitaciones...</p>
+            </div>
+          ) : error ? (
+            <div className="alert alert-danger" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+              <Button 
+                variant="outline-danger" 
+                size="sm" 
+                className="ms-3"
+                onClick={cargarHabitaciones}
+              >
+                Reintentar
+              </Button>
+            </div>
+          ) : habitaciones.length === 0 ? (
+            <p className="text-muted text-center py-5">
+              No hay habitaciones registradas. Agrega una nueva habitación usando el formulario.
+            </p>
           ) : (
-            <p className="text-muted">No hay habitaciones para mostrar.</p>
+            <CardsHabitaciones 
+              habitaciones={habitaciones} 
+              onEditarHabitacion={handleEditarHabitacion}
+              onEliminarHabitacion={handleEliminarHabitacion}
+            />
           )}
         </Col>
       </Row>
+
+      {/* Modal para editar habitación */}
+      <ModalEditarHabitacion
+        show={showModalEditar}
+        onHide={() => {
+          setShowModalEditar(false);
+          setHabitacionSeleccionada(null);
+        }}
+        habitacion={habitacionSeleccionada}
+        onHabitacionEditada={handleHabitacionEditada}
+      />
     </Container>
   );
 };

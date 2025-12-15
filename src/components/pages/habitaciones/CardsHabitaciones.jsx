@@ -1,6 +1,14 @@
 import { Card, Button, Col, Row } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+const CardsHabitaciones = ({ habitaciones, onEditarHabitacion, onEliminarHabitacion }) => {
+  
+  return (
+    <Row className="g-4">
+      {habitaciones.map((hab) => (
+        <Col md={6} key={hab._id || hab.id}>
+          <Card className="h-100 shadow-sm card-room">
+            <Card.Img variant="top" src={hab.imagen || hab.img} />
 const CardsHabitaciones = ({ habitaciones, borrarHabitacion }) => {
   return (
     <Row className="g-4">
@@ -21,36 +29,35 @@ const CardsHabitaciones = ({ habitaciones, borrarHabitacion }) => {
                 <Card.Title>Habitación {hab.numero}</Card.Title>
                 <span
                   className={`fw-bold ${
-                    hab.estado === "disponible"
+                    hab.estado === "disponible" || hab.estado === "Disponible"
                       ? "text-success"
-                      : hab.estado === "ocupada"
+                      : hab.estado === "ocupada" || hab.estado === "Ocupada"
                       ? "text-danger"
                       : "text-warning"
                   }`}
                 >
-                  {hab.estado}
+                  {hab.estado ? hab.estado.charAt(0).toUpperCase() + hab.estado.slice(1).toLowerCase() : hab.estado}
                 </span>
               </div>
 
-              <Card.Text className="text-muted small mt-2">
-                {hab.tipo}
-              </Card.Text>
-              
-              <Card.Text className="fw-bold fs-5">
-                ${hab.precio} <span className="fs-6 fw-normal">/ noche</span>
+              <Card.Text className="text-capitalize">{hab.tipo}</Card.Text>
+              <Card.Text className="fw-bold">
+                ${hab.precio} / noche
               </Card.Text>
             </Card.Body>
 
-            <Card.Footer className="d-flex justify-content-between bg-white border-top-0 pb-3">
-              <Button variant="outline-primary" className="btn-room">
+            <Card.Footer className="d-flex justify-content-between">
+              <Button 
+                variant="primary" 
+                className="btn-room"
+                onClick={() => onEditarHabitacion && onEditarHabitacion(hab)}
+              >
                 <i className="bi bi-pencil-fill"></i> Editar
               </Button>
-
-              {/* CONEXIÓN DEL BOTÓN BORRAR */}
-              <Button
-                variant="danger"
+              <Button 
+                variant="danger" 
                 className="btn-room"
-                onClick={() => borrarHabitacion(hab._id || hab.id)}
+                onClick={() => onEliminarHabitacion && onEliminarHabitacion(hab)}
               >
                 <i className="bi bi-trash-fill"></i> Eliminar
               </Button>
