@@ -2,8 +2,8 @@ import "./index.css";
 import AdminHabitaciones from "./components/pages/AdminHabitaciones";
 import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/DetalleHabitacion";
-import ReservaHabitacion from "./components/pages/ReservaHabitacion"; // <--- 1. IMPORTAR AQUÍ
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"; // Asegúrate de que sea 'react-router-dom'
+import ReservaHabitacion from "./components/pages/ReservaHabitacion"; 
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"; 
 import { Inicio } from "./components/pages/Inicio";
 import { QuienesSomos } from "./components/pages/QuienesSomos";
 import { Galeria } from "./components/pages/Galeria";
