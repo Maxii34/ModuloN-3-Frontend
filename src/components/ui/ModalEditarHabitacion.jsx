@@ -8,33 +8,33 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors }
   } = useForm();
 
   // Cargar datos de la habitación cuando se abre el modal
   useEffect(() => {
     if (habitacion && show) {
-      reset({
-        numero: habitacion.numero,
-        tipo: habitacion.tipo,
-        precio: habitacion.precio,
-        capacidad: habitacion.capacidad,
-        piso: habitacion.piso,
-        metros: habitacion.metros,
-        caracteristicas: habitacion.caracteristicas || "",
-        descripcion: habitacion.descripcion || "",
-        estado: habitacion.estado,
-        imagen: habitacion.imagen || "",
-      });
+      // Usamos setValue para asegurar que los campos se llenen correctamente
+      setValue("numero", habitacion.numero);
+      setValue("tipo", habitacion.tipo);
+      setValue("precio", habitacion.precio);
+      setValue("capacidad", habitacion.capacidad);
+      setValue("piso", habitacion.piso);
+      setValue("metros", habitacion.metros);
+      setValue("caracteristicas", habitacion.caracteristicas || "");
+      setValue("descripcion", habitacion.descripcion || "");
+      setValue("estado", habitacion.estado);
+      setValue("imagen", habitacion.imagen || habitacion.img || "");
     }
-  }, [habitacion, show, reset]);
+  }, [habitacion, show, setValue]);
 
   const onSubmit = async (data) => {
     try {
-      // Importar la función de actualizar
-      const { actualizarHabitacion } = await import("../../services/habitacionesAPI");
-      
-      // Asegurar que tipo y estado estén en minúsculas como espera el backend
+      // 1. OBTENER ID (Manejo de _id de Mongo o id de prueba)
+      const id = habitacion._id || habitacion.id;
+
+      // 2. FORMATEAR DATOS (Convertir strings a números y minúsculas)
       const datosFormateados = {
         ...data,
         tipo: data.tipo?.toLowerCase(),
@@ -45,10 +45,21 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
         piso: Number(data.piso),
         metros: Number(data.metros),
       };
-      
-      const id = habitacion._id || habitacion.id;
-      await actualizarHabitacion(id, datosFormateados);
 
+      // 3. PETICIÓN DIRECTA AL BACKEND (Sin archivos externos)
+      const respuesta = await fetch(`http://localhost:3000/api/habitaciones/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(datosFormateados),
+      });
+
+      if (!respuesta.ok) {
+        throw new Error("Error al actualizar en el servidor");
+      }
+
+      // 4. ÉXITO
       Swal.fire({
         title: "¡Editada!",
         text: "La habitación ha sido actualizada correctamente.",
@@ -60,14 +71,16 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
       // Cerrar el modal
       onHide();
 
-      // Actualizar la lista de habitaciones
+      // Avisar al padre (AdminHabitaciones) para que recargue la lista
       if (onHabitacionEditada) {
         onHabitacionEditada();
       }
+
     } catch (error) {
+      console.error(error);
       Swal.fire({
         title: "Error",
-        text: error.message || "No se pudo actualizar la habitación",
+        text: "No se pudo actualizar. Revisa que el servidor esté corriendo en el puerto 3000.",
         icon: "error",
         confirmButtonText: "Aceptar",
       });
