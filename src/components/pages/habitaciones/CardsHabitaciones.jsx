@@ -1,18 +1,24 @@
 import { Card, Button, Col, Row } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-// 1. AQUI CAMBIAMOS 'handleEditar' POR 'onEditarHabitacion'
 const CardsHabitaciones = ({ habitaciones, borrarHabitacion, onEditarHabitacion }) => {
   return (
     <Row className="g-4">
       {habitaciones.map((hab) => (
         <Col md={6} key={hab._id || hab.id}>
           <Card className="h-100 shadow-sm card-room">
+            
+            {/* --- AQUÍ ESTÁ EL CAMBIO CLAVE --- */}
+            {/* Ahora busca 'imagenes' (tu backend actual), 'imagen' (singular) o 'img' (falso) */}
             <Card.Img
               variant="top"
-              src={hab.imagen || hab.img}
+              src={hab.imagenes || hab.imagen || hab.img} 
               style={{ height: "200px", objectFit: "cover" }}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/300x200?text=Sin+Imagen"; // Imagen por defecto si falla
+              }}
             />
+
             <Card.Body>
               <div className="d-flex justify-content-between">
                 <Card.Title>Habitación {hab.numero}</Card.Title>
@@ -33,8 +39,6 @@ const CardsHabitaciones = ({ habitaciones, borrarHabitacion, onEditarHabitacion 
             </Card.Body>
 
             <Card.Footer className="d-flex justify-content-between bg-white border-top-0 pb-3">
-              
-              {/* 2. AQUI USAMOS EL NOMBRE CORRECTO EN EL ONCLICK */}
               <Button 
                 variant="primary" 
                 className="btn-room"
