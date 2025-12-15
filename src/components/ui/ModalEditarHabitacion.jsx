@@ -23,10 +23,7 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
       setValue("caracteristicas", habitacion.caracteristicas || "");
       setValue("descripcion", habitacion.descripcion || "");
       setValue("estado", habitacion.estado);
-      
-      // CAMBIO 1: Cargar nombres correctos (Plurales)
       setValue("metrosCuadrados", habitacion.metrosCuadrados);
-      // Intentamos cargar 'imagenes', si no existe probamos con 'imagen' por compatibilidad
       setValue("imagenes", habitacion.imagenes || habitacion.imagen || "");
     }
   }, [habitacion, show, setValue]);
@@ -43,8 +40,6 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
         precio: Number(data.precio),
         capacidad: Number(data.capacidad),
         piso: Number(data.piso),
-        
-        // CAMBIO 2: Enviar nombres correctos al Backend
         metrosCuadrados: Number(data.metrosCuadrados),
         imagenes: data.imagenes, 
       };
@@ -129,7 +124,6 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
             <Form.Control type="number" {...register("piso", { required: true })} />
           </Form.Group>
 
-          {/* CAMBIO 3: Input de Metros Cuadrados con nombre correcto */}
           <Form.Group className="mb-3">
             <Form.Label>Metros Cuadrados</Form.Label>
             <Form.Control
@@ -170,7 +164,6 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
             </div>
           </Form.Group>
 
-          {/* CAMBIO 4: Input de Imágenes con nombre correcto */}
           <Form.Group className="mb-4">
             <Form.Label>Imagen URL</Form.Label>
             <Form.Control

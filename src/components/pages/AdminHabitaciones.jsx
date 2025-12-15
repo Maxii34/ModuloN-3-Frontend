@@ -21,7 +21,7 @@ const AdminHabitaciones = () => {
   const [showModalEditar, setShowModalEditar] = useState(false);
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
 
-  // --- LEER (GET) ---
+  // LEER (GET)
   const obtenerHabitaciones = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/api/habitaciones");
@@ -36,7 +36,7 @@ const AdminHabitaciones = () => {
     obtenerHabitaciones();
   }, []);
 
-  // --- CREAR (POST) ---
+  // CREAR (POST)
   const onSubmit = async (data) => {
     try {
       const habitacionNueva = {
@@ -44,7 +44,6 @@ const AdminHabitaciones = () => {
         tipo: data.tipo,
         precio: parseFloat(data.precio),
         estado: data.estado,
-        // CAMBIO 1: Enviamos 'imagenes' (plural) al Backend
         imagenes: data.imagenes, 
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
@@ -76,7 +75,7 @@ const AdminHabitaciones = () => {
     }
   };
 
-  // --- BORRAR (DELETE) ---
+  // BORRAR (DELETE) 
   const borrarHabitacion = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
@@ -125,9 +124,6 @@ const AdminHabitaciones = () => {
         <Col md={4} className="p-4 border rounded bg-light">
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            
-            {/* ... (Inputs de Número, Tipo, Precio, Capacidad, Piso, metrosCuadrados, Características, Descripción, Estado IGUAL QUE ANTES) ... */}
-            
             <Form.Group className="mb-3">
               <Form.Label>Número</Form.Label>
               <Form.Control type="number" placeholder="Ej: 101" {...register("numero", { required: "Obligatorio" })} />
