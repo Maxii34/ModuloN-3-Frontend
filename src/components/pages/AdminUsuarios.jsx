@@ -1,4 +1,4 @@
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import { useState } from "react";
 import UserTable from "./usuarios/UserTable";
 
@@ -10,7 +10,6 @@ const AdminUsuarios = () => {
       apellido: "Torres",
       email: "ana.torres@hotel.com",
       tipo: "admin",
-      estado: "Activo",
       avatar: "https://i.pravatar.cc/150?img=47",
     },
     {
@@ -19,7 +18,6 @@ const AdminUsuarios = () => {
       apellido: "Gomez",
       email: "carlos.gomez@hotel.com",
       tipo: "usuario",
-      estado: "Activo",
       avatar: "https://i.pravatar.cc/150?img=12",
     },
     {
@@ -28,7 +26,6 @@ const AdminUsuarios = () => {
       apellido: "Fernandez",
       email: "luisa.fernandez@hotel.com",
       tipo: "admin",
-      estado: "Suspendido",
       avatar: "https://i.pravatar.cc/150?img=32",
     },
   ]);
@@ -36,7 +33,6 @@ const AdminUsuarios = () => {
   const [filtros, setFiltros] = useState({
     search: "",
     rol: "Todos",
-    estado: "Todos",
   });
 
   const usuariosFiltrados = usuarios.filter((u) => {
@@ -48,25 +44,22 @@ const AdminUsuarios = () => {
     const matchRol =
       filtros.rol === "Todos" || u.tipo === filtros.rol;
 
-    const matchEstado =
-      filtros.estado === "Todos" || u.estado === filtros.estado;
-
-    return matchSearch && matchRol && matchEstado;
+    return matchSearch && matchRol;
   });
 
   return (
     <Container className="p-4">
       {/* HEADER */}
-      <Row className="mb-4 align-items-center">
+      <Row className="mb-4">
         <Col>
-            <h2 className="fw-bold mb-1">Administración de Usuarios</h2>
-            <p className="text-muted mb-0">
+          <h2 className="fw-bold mb-1">Administración de Usuarios</h2>
+          <p className="text-muted mb-0">
             Gestiona el acceso y permisos de los usuarios del sistema.
-            </p>
+          </p>
         </Col>
-    </Row>
+      </Row>
 
-      {/* FILTROS (integrados) */}
+      {/* FILTROS */}
       <Row className="mb-4 g-3">
         <Col md={6}>
           <Form.Control
@@ -89,19 +82,6 @@ const AdminUsuarios = () => {
             <option value="Todos">Rol: Todos</option>
             <option value="admin">Administrador</option>
             <option value="usuario">Usuario</option>
-          </Form.Select>
-        </Col>
-
-        <Col md={3}>
-          <Form.Select
-            value={filtros.estado}
-            onChange={(e) =>
-              setFiltros({ ...filtros, estado: e.target.value })
-            }
-          >
-            <option value="Todos">Estado: Todos</option>
-            <option value="Activo">Activo</option>
-            <option value="Suspendido">Suspendido</option>
           </Form.Select>
         </Col>
       </Row>
