@@ -11,7 +11,7 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
     reset,
     formState: { errors },
   } = useForm();
-  const { loginAdmin } = useAuth();
+  const { loginAdmin, loginUser } = useAuth();
   const navigate = useNavigate();
 
   const iniciarSesion = () => {
@@ -33,7 +33,15 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
       navigate("/admin-dashboard");
     } else {
       // Lógica para usuario normal
-      console.log("Usuario normal registrado");
+      loginUser({
+        nombre: data.nombre,
+        apellido: data.apellido,
+        email: data.email,
+        telefono: data.telefono,
+        tipo: "usuario",
+      });
+      registerClose();
+      navigate("/");
     }
     reset();
   };
