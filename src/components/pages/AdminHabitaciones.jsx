@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const AdminHabitaciones = () => {
   const {
@@ -14,35 +14,24 @@ const AdminHabitaciones = () => {
     formState: { errors },
   } = useForm();
 
-  const [habitaciones, setHabitaciones] = useState([
-    // Esta primera habitacion lo use de ejemplo usando _id de los datos de MongoDB ya creados para usarlos como prueba para borrar hasta que el create este conectado
-    // el id usado en esta habitacion ya no existe porque fue borrada, pero lo dejo como referencia
-    
-    {
-      _id: "692ce1be834ac53fe142dada",
-      numero: 36,
-      tipo: "matrimonial",
-      precio: 15000,
-      estado: "disponible",
-      img: "https://images.pexels.com/photos/34989794/pexels-photo-34989794.jpeg",
-    },
-    {
-      id: 2,
-      numero: "204",
-      tipo: "Doble",
-      precio: 220,
-      estado: "Ocupada",
-      img: "https://images.pexels.com/photos/276224/pexels-photo-276224.jpeg",
-    },
-    {
-      id: 3,
-      numero: "301",
-      tipo: "Suite",
-      precio: 350,
-      estado: "Mantenimiento",
-      img: "https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg",
-    },
-  ]);
+  const [habitaciones, setHabitaciones] = useState([]);
+
+  useEffect(() => {
+    obtenerHabitaciones();
+  }, []);
+
+  const obtenerHabitaciones = async () => {
+    try {
+      // Petición al Backend
+      const respuesta = await fetch("http://localhost:3000/api/habitaciones");
+      const datos = await respuesta.json();
+      console.log("Datos del Backend:", datos);
+      // Guardamos los datos REALES en el estado
+      setHabitaciones(datos);
+    } catch (error) {
+      console.error("Error al cargar habitaciones:", error);
+    }
+  };
 
   const onSubmit = (data) => {
     console.log("Datos validados:", data);
