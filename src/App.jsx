@@ -116,7 +116,7 @@ function AppRouter({
             <Routes>
               <Route path="/" element={<Inicio />} />
               <Route 
-                path="/detalle" 
+                path="/detalle/:id" 
                 element={
                   <ProtectedUserRoute>
                     <DetalleHabitacion />
