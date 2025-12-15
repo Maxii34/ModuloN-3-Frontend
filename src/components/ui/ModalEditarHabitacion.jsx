@@ -3,13 +3,18 @@ import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 
-const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }) => {
+const ModalEditarHabitacion = ({
+  show,
+  onHide,
+  habitacion,
+  onHabitacionEditada,
+}) => {
   const {
     register,
     handleSubmit,
     reset,
     setValue,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
   // Cargar datos de la habitación cuando se abre el modal
@@ -41,16 +46,19 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
         capacidad: Number(data.capacidad),
         piso: Number(data.piso),
         metrosCuadrados: Number(data.metrosCuadrados),
-        imagenes: data.imagenes, 
+        imagenes: data.imagenes,
       };
 
-      const respuesta = await fetch(`http://localhost:3000/api/habitaciones/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(datosFormateados),
-      });
+      const respuesta = await fetch(
+        `http://localhost:3000/api/habitaciones/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(datosFormateados),
+        }
+      );
 
       if (!respuesta.ok) {
         throw new Error("Error al actualizar en el servidor");
@@ -69,7 +77,6 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
       if (onHabitacionEditada) {
         onHabitacionEditada();
       }
-
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -88,7 +95,6 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          
           <Form.Group className="mb-3">
             <Form.Label>Número de Habitación</Form.Label>
             <Form.Control
@@ -111,17 +117,26 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
 
           <Form.Group className="mb-3">
             <Form.Label>Precio ($)</Form.Label>
-            <Form.Control type="number" {...register("precio", { required: true })} />
+            <Form.Control
+              type="number"
+              {...register("precio", { required: true })}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Capacidad</Form.Label>
-            <Form.Control type="number" {...register("capacidad", { required: true })} />
+            <Form.Control
+              type="number"
+              {...register("capacidad", { required: true })}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Piso</Form.Label>
-            <Form.Control type="number" {...register("piso", { required: true })} />
+            <Form.Control
+              type="number"
+              {...register("piso", { required: true })}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -129,22 +144,31 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
             <Form.Control
               type="number"
               placeholder="Ej: 25"
-              {...register("metrosCuadrados", { 
+              {...register("metrosCuadrados", {
                 required: "Los metros cuadrados son obligatorios",
-                min: { value: 5, message: "Mínimo 5" } 
+                min: { value: 5, message: "Mínimo 5" },
               })}
             />
-            <Form.Text className="text-danger">{errors.metrosCuadrados?.message}</Form.Text>
+            <Form.Text className="text-danger">
+              {errors.metrosCuadrados?.message}
+            </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Características</Form.Label>
-            <Form.Control type="text" {...register("caracteristicas", { required: true })} />
+            <Form.Control
+              type="text"
+              {...register("caracteristicas", { required: true })}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Descripción</Form.Label>
-            <Form.Control as="textarea" rows={3} {...register("descripcion", { required: true })} />
+            <Form.Control
+              as="textarea"
+              rows={3}
+              {...register("descripcion", { required: true })}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -169,9 +193,13 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
             <Form.Control
               type="text"
               placeholder="Ej: https://example.com/habitacion.jpg"
-              {...register("imagenes", { required: "Debe proporcionar una imagen" })}
+              {...register("imagenes", {
+                required: "Debe proporcionar una imagen",
+              })}
             />
-            <Form.Text className="text-danger">{errors.imagenes?.message}</Form.Text>
+            <Form.Text className="text-danger">
+              {errors.imagenes?.message}
+            </Form.Text>
           </Form.Group>
 
           <div className="d-flex gap-2 justify-content-end">

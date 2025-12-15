@@ -16,7 +16,7 @@ const AdminHabitaciones = () => {
   } = useForm();
 
   const [habitaciones, setHabitaciones] = useState([]);
-  
+
   // ESTADOS PARA EL MODAL
   const [showModalEditar, setShowModalEditar] = useState(false);
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
@@ -44,7 +44,7 @@ const AdminHabitaciones = () => {
         tipo: data.tipo,
         precio: parseFloat(data.precio),
         estado: data.estado,
-        imagenes: data.imagenes, 
+        imagenes: data.imagenes,
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
         metrosCuadrados: parseInt(data.metrosCuadrados),
@@ -75,7 +75,7 @@ const AdminHabitaciones = () => {
     }
   };
 
-  // BORRAR (DELETE) 
+  // BORRAR (DELETE)
   const borrarHabitacion = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
@@ -94,7 +94,9 @@ const AdminHabitaciones = () => {
           );
 
           if (response.ok) {
-            setHabitaciones(habitaciones.filter((hab) => (hab._id || hab.id) !== id));
+            setHabitaciones(
+              habitaciones.filter((hab) => (hab._id || hab.id) !== id)
+            );
             Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
           } else {
             Swal.fire("Error", "No se pudo eliminar.", "error");
@@ -107,7 +109,7 @@ const AdminHabitaciones = () => {
     });
   };
 
-  // LÓGICA DEL MODAL 
+  // LÓGICA DEL MODAL
   const handleEditarHabitacion = (habitacion) => {
     setHabitacionSeleccionada(habitacion);
     setShowModalEditar(true);
@@ -126,7 +128,11 @@ const AdminHabitaciones = () => {
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3">
               <Form.Label>Número</Form.Label>
-              <Form.Control type="number" placeholder="Ej: 101" {...register("numero", { required: "Obligatorio" })} />
+              <Form.Control
+                type="number"
+                placeholder="Ej: 101"
+                {...register("numero", { required: "Obligatorio" })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -143,32 +149,51 @@ const AdminHabitaciones = () => {
 
             <Form.Group className="mb-3">
               <Form.Label>Precio ($)</Form.Label>
-              <Form.Control type="number" {...register("precio", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("precio", { required: true })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Capacidad</Form.Label>
-              <Form.Control type="number" {...register("capacidad", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("capacidad", { required: true })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Piso</Form.Label>
-              <Form.Control type="number" {...register("piso", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("piso", { required: true })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Metros Cuadrados</Form.Label>
-              <Form.Control type="number" {...register("metrosCuadrados", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("metrosCuadrados", { required: true })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Características</Form.Label>
-              <Form.Control type="text" {...register("caracteristicas", { required: true })} />
+              <Form.Control
+                type="text"
+                {...register("caracteristicas", { required: true })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
-              <Form.Control as="textarea" rows={3} {...register("descripcion", { required: true })} />
+              <Form.Control
+                as="textarea"
+                rows={3}
+                {...register("descripcion", { required: true })}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -191,9 +216,9 @@ const AdminHabitaciones = () => {
             {/* CAMBIO 2: Input para 'imagenes' */}
             <Form.Group className="mb-4">
               <Form.Label>Imagen URL</Form.Label>
-              <Form.Control 
-                type="text" 
-                {...register("imagenes", { required: true })} 
+              <Form.Control
+                type="text"
+                {...register("imagenes", { required: true })}
               />
             </Form.Group>
 
@@ -210,7 +235,7 @@ const AdminHabitaciones = () => {
             <CardsHabitaciones
               habitaciones={habitaciones}
               borrarHabitacion={borrarHabitacion}
-              onEditarHabitacion={handleEditarHabitacion} 
+              onEditarHabitacion={handleEditarHabitacion}
             />
           ) : (
             <p className="text-muted">No hay habitaciones registradas.</p>

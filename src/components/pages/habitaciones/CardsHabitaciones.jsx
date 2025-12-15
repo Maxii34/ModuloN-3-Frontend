@@ -1,7 +1,11 @@
 import { Card, Button, Col, Row } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-const CardsHabitaciones = ({ habitaciones, borrarHabitacion, onEditarHabitacion }) => {
+const CardsHabitaciones = ({
+  habitaciones,
+  borrarHabitacion,
+  onEditarHabitacion,
+}) => {
   return (
     <Row className="g-4">
       {habitaciones.map((hab) => (
@@ -9,10 +13,11 @@ const CardsHabitaciones = ({ habitaciones, borrarHabitacion, onEditarHabitacion 
           <Card className="h-100 shadow-sm card-room">
             <Card.Img
               variant="top"
-              src={hab.imagenes || hab.imagen || hab.img} 
+              src={hab.imagenes || hab.imagen || hab.img}
               style={{ height: "200px", objectFit: "cover" }}
               onError={(e) => {
-                e.target.src = "https://via.placeholder.com/300x200?text=Sin+Imagen";
+                e.target.src =
+                  "https://via.placeholder.com/300x200?text=Sin+Imagen";
               }}
             />
 
@@ -36,8 +41,8 @@ const CardsHabitaciones = ({ habitaciones, borrarHabitacion, onEditarHabitacion 
             </Card.Body>
 
             <Card.Footer className="d-flex justify-content-between bg-white border-top-0 pb-3">
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 className="btn-room"
                 onClick={() => onEditarHabitacion(hab)}
               >
