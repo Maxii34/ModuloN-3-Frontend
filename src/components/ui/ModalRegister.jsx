@@ -2,7 +2,7 @@ import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
-import { iniciarSesion, registrarUsuario } from "../helpers/queries";
+import { registrarUsuario } from "../helpers/queries";
 import Swal from "sweetalert2";
 
 
@@ -22,8 +22,6 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
   };
 
   const onSubmi = async (data) => {
-    console.log(data);
-    //Agregar logica de login.
     const nuevoUsuario = {
       nombre: data.nombre,
       apellido: data.apellido,
@@ -33,7 +31,6 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
       tipo: "usuario"
     }
     
-
     const respuesta = await registrarUsuario(nuevoUsuario);
     if (!respuesta || !respuesta.ok) {
       const datos = await respuesta.json();

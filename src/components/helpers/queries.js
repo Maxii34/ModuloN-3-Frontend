@@ -18,7 +18,7 @@ export const registrarUsuario = async (nuevoUsuario) => {
 
 export const iniciarSesion = async (usuario) => {
   try {
-    const respuesta = await fetch(usuariosBack, {
+    const respuesta = await fetch(`${usuariosBack}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

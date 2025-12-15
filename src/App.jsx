@@ -11,7 +11,7 @@ import { Contacto } from "./components/pages/Contacto";
 import Menu from "./components/shared/Menu";
 import { ModalLogin } from "./components/ui/ModalLogin";
 import { ModalRegister } from "./components/ui/ModalRegister";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import Error404 from "./components/pages/Error404";
 
 function App() {
@@ -22,6 +22,15 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const registerClose = () => setShowRegister(false);
   const registerShow = () => setShowRegister(true);
+
+
+  const sessionUsuario = JSON.parse(sessionStorage.getItem("usuarioKey")) || {};
+  const [usuarioLogueado, setUsuarioLogueado] = useState(sessionUsuario);
+  useEffect(() => {
+    sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioLogueado));
+  }, [usuarioLogueado]);
+  
+
 
   return (
     <>
@@ -44,6 +53,7 @@ function App() {
         showLogin={showLogin}
         loginClose={loginClose}
         registerShow={registerShow}
+        setUsuarioLogueado={setUsuarioLogueado}
         />
         <ModalRegister 
         showRegister={showRegister}

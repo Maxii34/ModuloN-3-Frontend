@@ -1,9 +1,16 @@
 import { Button, Modal, Form } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
-
-export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
+import { Link, useNavigate } from "react-router";
+import { iniciarSesion } from "../helpers/queries";
+import Swal from "sweetalert2";
+ 
+export const ModalLogin = ({
+  showLogin,
+  loginClose,
+  registerShow,
+  setUsuarioLogueado,
+}) => {
   const {
     register,
     handleSubmit,
@@ -11,15 +18,54 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
     formState: { errors },
   } = useForm();
 
+  const navegacion = useNavigate();
+
+
   const RegistrateAki = () => {
     registerShow();
     loginClose();
   };
 
-  const onSubmi = (data) => {
-    console.log(data);
-    //Agregar logica de login.
-    reset();
+  const onSubmi = async (data) => {
+    const respuesta = await iniciarSesion(data);
+    if (respuesta && respuesta.status === 200) {
+      const datos = await respuesta.json();
+
+      const usuarioData = {
+        usuario: datos.usuario,
+        token: datos.token,
+        tipo: datos.usuario.tipo,
+      };
+
+      setUsuarioLogueado(usuarioData);
+
+      sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
+
+      Swal.fire({
+        title: "¡Bienvenido!",
+        text: "Has iniciado sesión correctamente.",
+        icon: "success",
+        timer: 2500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+
+      reset();
+      loginClose();
+
+      // Redirigir según tipo
+      if (datos.usuario.tipo === "admin") {
+        navegacion("/admin");
+      } else {
+        navegacion("/");
+      }
+    } else {
+      Swal.fire({
+        title: "Ocurrió un error",
+        text: "Credenciales incorrectas",
+        icon: "error",
+      });
+    }
   };
 
   return (
