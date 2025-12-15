@@ -2,12 +2,27 @@ import { Card, Button, Col, Row } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const CardsHabitaciones = ({ habitaciones, onEditarHabitacion, onEliminarHabitacion }) => {
+  
   return (
     <Row className="g-4">
       {habitaciones.map((hab) => (
         <Col md={6} key={hab._id || hab.id}>
           <Card className="h-100 shadow-sm card-room">
             <Card.Img variant="top" src={hab.imagen || hab.img} />
+const CardsHabitaciones = ({ habitaciones, borrarHabitacion }) => {
+  return (
+    <Row className="g-4">
+      {habitaciones.map((hab) => (
+        // Usamos _id (mongo) o id (fallback)
+        <Col md={6} key={hab._id || hab.id}>
+          <Card className="h-100 shadow-sm card-room">
+            
+            {/* CORRECCIÓN: Aceptamos 'imagen' o 'img' y fijamos altura */}
+            <Card.Img
+              variant="top"
+              src={hab.imagen || hab.img}
+              style={{ height: "200px", objectFit: "cover" }}
+            />
 
             <Card.Body>
               <div className="d-flex justify-content-between">
