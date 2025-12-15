@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router";
 import { registrarUsuario } from "../helpers/queries";
 import Swal from "sweetalert2";
 
-
 export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
   const {
     register,
@@ -13,7 +12,6 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
     reset,
     formState: { errors },
   } = useForm();
-
   const navigate = useNavigate();
 
   const iniciar = () => {
@@ -187,6 +185,28 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
                   {errors.password && (
                     <span className="text-danger">
                       {errors.password.message}
+                    </span>
+                  )}
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="justify-content-center">
+              <Col md={10}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Tipo de Usuario</Form.Label>
+                  <Form.Select
+                    {...register("tipoUsuario", {
+                      required: "Debes seleccionar un tipo de usuario",
+                    })}
+                  >
+                    <option value="">Selecciona un tipo</option>
+                    <option value="usuario">Usuario</option>
+                    <option value="admin">Administrador</option>
+                  </Form.Select>
+                  {errors.tipoUsuario && (
+                    <span className="text-danger">
+                      {errors.tipoUsuario.message}
                     </span>
                   )}
                 </Form.Group>

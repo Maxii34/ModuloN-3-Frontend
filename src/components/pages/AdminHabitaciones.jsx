@@ -4,42 +4,34 @@ import Swal from "sweetalert2";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
+import { useState, useEffect } from "react";
 
 const AdminHabitaciones = () => {
-
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
-  const habitacionesEjemplo = [
-    {
-      id: 1,
-      numero: "101",
-      tipo: "Simple",
-      precio: 150,
-      estado: "Disponible",
-      img: "https://images.pexels.com/photos/34983175/pexels-photo-34983175.jpeg",
-    },
-    {
-      id: 2,
-      numero: "204",
-      tipo: "Doble",
-      precio: 220,
-      estado: "Ocupada",
-      img: "https://images.pexels.com/photos/276224/pexels-photo-276224.jpeg",
-    },
-    {
-      id: 3,
-      numero: "301",
-      tipo: "Suite",
-      precio: 350,
-      estado: "Mantenimiento",
-      img: "https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg",
-    },
-  ];
+  const [habitaciones, setHabitaciones] = useState([]);
+
+  useEffect(() => {
+    obtenerHabitaciones();
+  }, []);
+
+  const obtenerHabitaciones = async () => {
+    try {
+      // Petición al Backend
+      const respuesta = await fetch("http://localhost:3000/api/habitaciones");
+      const datos = await respuesta.json();
+      console.log("Datos del Backend:", datos);
+      // Guardamos los datos REALES en el estado
+      setHabitaciones(datos);
+    } catch (error) {
+      console.error("Error al cargar habitaciones:", error);
+    }
+  };
 
   const onSubmit = (data) => {
     console.log("Datos validados:", data);
@@ -47,16 +39,68 @@ const AdminHabitaciones = () => {
     Swal.fire({
       title: "Habitación guardada",
       text: "Los datos se han registrado correctamente",
-      icon: "success"
+      icon: "success",
     });
 
     reset();
   };
 
+  const borrarHabitacion = (id) => {
+    Swal.fire({
+      title: "¿Estás seguro de eliminar esta habitación?",
+      text: "¡No podrás revertir esto!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          console.log("Intentando borrar ID:", id); // 1. Ver qué ID estamos enviando
+
+          const response = await fetch(
+            `http://localhost:3000/api/habitaciones/${id}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          console.log("Respuesta del server (Status):", response.status); // 2. Ver el código de respuesta (200, 404, 500?)
+
+          if (response.ok) {
+            // Usamos 'hab._id' porque MongoDB usa guion bajo, y 'hab.id' para los ejemplos falsos.
+            setHabitaciones(
+              habitaciones.filter((hab) => (hab._id || hab.id) !== id)
+            );
+
+            Swal.fire({
+              title: "¡Eliminado!",
+              text: "La habitación ha sido eliminada de la base de datos.",
+              icon: "success",
+            });
+          } else {
+            // Si falla, leemos el mensaje de error del backend
+            const mensajeError = await response.json();
+            console.log("Error detallado:", mensajeError);
+
+            Swal.fire(
+              "Error",
+              `No se pudo eliminar. Código: ${response.status}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          console.error("Error de red:", error);
+          Swal.fire("Error", "Fallo de conexión con el servidor.", "error");
+        }
+      }
+    });
+  };
+
   return (
     <Container className="my-5">
       <Row className="gap-4 justify-content-center">
-
         {/* --------------------------------------
             COLUMNA IZQUIERDA: FORMULARIO
         --------------------------------------- */}
@@ -64,7 +108,6 @@ const AdminHabitaciones = () => {
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
 
           <Form onSubmit={handleSubmit(onSubmit)}>
-
             {/* Número */}
             <Form.Group className="mb-3">
               <Form.Label>Número de Habitación</Form.Label>
@@ -74,17 +117,21 @@ const AdminHabitaciones = () => {
                 {...register("numero", {
                   required: "El número de habitación es obligatorio",
                   min: { value: 1, message: "Debe ser mayor o igual a 1" },
-                  max: { value: 500, message: "Debe ser menor o igual a 500" }
+                  max: { value: 500, message: "Debe ser menor o igual a 500" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.numero?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.numero?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Tipo */}
             <Form.Group className="mb-3">
               <Form.Label>Tipo de Habitación</Form.Label>
               <Form.Select
-                {...register("tipo", { required: "Debe seleccionar un tipo de habitación" })}
+                {...register("tipo", {
+                  required: "Debe seleccionar un tipo de habitación",
+                })}
               >
                 <option value="">Seleccionar tipo</option>
                 <option value="individual">Individual</option>
@@ -93,7 +140,9 @@ const AdminHabitaciones = () => {
                 <option value="suite">Suite</option>
                 <option value="familiar">Familiar</option>
               </Form.Select>
-              <Form.Text className="text-danger">{errors.tipo?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.tipo?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Precio */}
@@ -105,10 +154,12 @@ const AdminHabitaciones = () => {
                 {...register("precio", {
                   required: "El precio es obligatorio",
                   min: { value: 1, message: "Debe ser mayor que 0" },
-                  max: { value: 200000, message: "Máximo permitido: $200.000" }
+                  max: { value: 200000, message: "Máximo permitido: $200.000" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.precio?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.precio?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Capacidad */}
@@ -123,7 +174,9 @@ const AdminHabitaciones = () => {
                   max: { value: 10, message: "Máximo 10 huéspedes" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.capacidad?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.capacidad?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Piso */}
@@ -138,7 +191,9 @@ const AdminHabitaciones = () => {
                   max: { value: 15, message: "Máximo piso permitido: 15" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.piso?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.piso?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Metros */}
@@ -153,7 +208,9 @@ const AdminHabitaciones = () => {
                   max: { value: 200, message: "Máximo 200 m2" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.metros?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.metros?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Características */}
@@ -168,7 +225,9 @@ const AdminHabitaciones = () => {
                   maxLength: { value: 80, message: "Máximo 80 caracteres" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.caracteristicas?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.caracteristicas?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Descripción */}
@@ -180,32 +239,43 @@ const AdminHabitaciones = () => {
                 placeholder="Describe la habitación..."
                 {...register("descripcion", {
                   required: "La descripción es obligatoria",
-                  minLength: { value: 10, message: "Debe tener al menos 10 caracteres" },
+                  minLength: {
+                    value: 10,
+                    message: "Debe tener al menos 10 caracteres",
+                  },
                   maxLength: { value: 500, message: "Máximo 500 caracteres" },
                 })}
               />
-              <Form.Text className="text-danger">{errors.descripcion?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.descripcion?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Estado */}
             <Form.Group className="mb-3">
               <Form.Label>Estado</Form.Label>
               <div className="d-flex flex-wrap gap-3 mt-2">
-                {["disponible", "ocupada", "reservada", "limpieza", "mantenimiento"].map(
-                  (estado) => (
-                    <Form.Check
-                      type="radio"
-                      key={estado}
-                      label={estado.charAt(0).toUpperCase() + estado.slice(1)}
-                      value={estado}
-                      {...register("estado", {
-                        required: "Debe seleccionar un estado",
-                      })}
-                    />
-                  )
-                )}
+                {[
+                  "disponible",
+                  "ocupada",
+                  "reservada",
+                  "limpieza",
+                  "mantenimiento",
+                ].map((estado) => (
+                  <Form.Check
+                    type="radio"
+                    key={estado}
+                    label={estado.charAt(0).toUpperCase() + estado.slice(1)}
+                    value={estado}
+                    {...register("estado", {
+                      required: "Debe seleccionar un estado",
+                    })}
+                  />
+                ))}
               </div>
-              <Form.Text className="text-danger">{errors.estado?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.estado?.message}
+              </Form.Text>
             </Form.Group>
 
             {/* Imagen */}
@@ -222,13 +292,14 @@ const AdminHabitaciones = () => {
                   },
                 })}
               />
-              <Form.Text className="text-danger">{errors.imagen?.message}</Form.Text>
+              <Form.Text className="text-danger">
+                {errors.imagen?.message}
+              </Form.Text>
             </Form.Group>
 
             <Button variant="primary" type="submit" className="w-100">
               Guardar Habitación
             </Button>
-
           </Form>
         </Col>
 
@@ -237,14 +308,16 @@ const AdminHabitaciones = () => {
         --------------------------------------- */}
         <Col md={7} className="p-4 border rounded bg-white">
           <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
-
-          {habitacionesEjemplo ? (
-            <CardsHabitaciones habitaciones={habitacionesEjemplo} />
+          {/* CORRECCIÓN: Usamos 'habitaciones' en lugar de 'habitacionesEjemplo' */}
+          {habitaciones.length > 0 ? (
+            <CardsHabitaciones
+              habitaciones={habitaciones}
+              borrarHabitacion={borrarHabitacion}
+            />
           ) : (
-            <p className="text-muted">Cargando habitaciones...</p>
+            <p className="text-muted">No hay habitaciones para mostrar.</p>
           )}
         </Col>
-
       </Row>
     </Container>
   );
