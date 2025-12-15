@@ -1,10 +1,11 @@
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
-import { useState, useEffect } from "react";
+import ModalEditarHabitacion from "../ui/ModalEditarHabitacion";
 
 const AdminHabitaciones = () => {
   const {
@@ -15,39 +16,69 @@ const AdminHabitaciones = () => {
   } = useForm();
 
   const [habitaciones, setHabitaciones] = useState([]);
+  
+  // 2. ESTADOS PARA EL MODAL (Tal cual los tenía tu amigo)
+  const [showModalEditar, setShowModalEditar] = useState(false);
+  const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
 
-  useEffect(() => {
-    obtenerHabitaciones();
-  }, []);
-
+  // --- LEER (GET) ---
   const obtenerHabitaciones = async () => {
     try {
-      // Petición al Backend
       const respuesta = await fetch("http://localhost:3000/api/habitaciones");
       const datos = await respuesta.json();
-      console.log("Datos del Backend:", datos);
-      // Guardamos los datos REALES en el estado
       setHabitaciones(datos);
     } catch (error) {
       console.error("Error al cargar habitaciones:", error);
     }
   };
 
-  const onSubmit = (data) => {
-    console.log("Datos validados:", data);
+  useEffect(() => {
+    obtenerHabitaciones();
+  }, []);
 
-    Swal.fire({
-      title: "Habitación guardada",
-      text: "Los datos se han registrado correctamente",
-      icon: "success",
-    });
+  // --- CREAR (POST) ---
+  const onSubmit = async (data) => {
+    try {
+      const habitacionNueva = {
+        numero: parseInt(data.numero),
+        tipo: data.tipo,
+        precio: parseFloat(data.precio),
+        estado: data.estado,
+        imagen: data.imagen,
+        capacidad: parseInt(data.capacidad),
+        piso: parseInt(data.piso),
+        metros: parseInt(data.metros),
+        caracteristicas: data.caracteristicas,
+        descripcion: data.descripcion,
+      };
 
-    reset();
+      const response = await fetch("http://localhost:3000/api/habitaciones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(habitacionNueva),
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: "¡Creada!",
+          text: "La habitación se guardó correctamente",
+          icon: "success",
+        });
+        reset();
+        obtenerHabitaciones();
+      } else {
+        Swal.fire("Error", "No se pudo guardar la habitación", "error");
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "Fallo de conexión", "error");
+    }
   };
 
+  // --- BORRAR (DELETE) ---
   const borrarHabitacion = (id) => {
     Swal.fire({
-      title: "¿Estás seguro de eliminar esta habitación?",
+      title: "¿Estás seguro?",
       text: "¡No podrás revertir esto!",
       icon: "warning",
       showCancelButton: true,
@@ -57,82 +88,59 @@ const AdminHabitaciones = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          console.log("Intentando borrar ID:", id); // 1. Ver qué ID estamos enviando
-
           const response = await fetch(
             `http://localhost:3000/api/habitaciones/${id}`,
-            {
-              method: "DELETE",
-            }
+            { method: "DELETE" }
           );
 
-          console.log("Respuesta del server (Status):", response.status); // 2. Ver el código de respuesta (200, 404, 500?)
-
           if (response.ok) {
-            // Usamos 'hab._id' porque MongoDB usa guion bajo, y 'hab.id' para los ejemplos falsos.
-            setHabitaciones(
-              habitaciones.filter((hab) => (hab._id || hab.id) !== id)
-            );
-
-            Swal.fire({
-              title: "¡Eliminado!",
-              text: "La habitación ha sido eliminada de la base de datos.",
-              icon: "success",
-            });
+            setHabitaciones(habitaciones.filter((hab) => (hab._id || hab.id) !== id));
+            Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
           } else {
-            // Si falla, leemos el mensaje de error del backend
-            const mensajeError = await response.json();
-            console.log("Error detallado:", mensajeError);
-
-            Swal.fire(
-              "Error",
-              `No se pudo eliminar. Código: ${response.status}`,
-              "error"
-            );
+            Swal.fire("Error", "No se pudo eliminar.", "error");
           }
         } catch (error) {
-          console.error("Error de red:", error);
-          Swal.fire("Error", "Fallo de conexión con el servidor.", "error");
+          console.error(error);
+          Swal.fire("Error", "Fallo de conexión.", "error");
         }
       }
     });
   };
 
+  // LÓGICA DEL MODAL 
+  
+  // 1. Abrir modal con los datos de la habitación
+  const handleEditarHabitacion = (habitacion) => {
+    setHabitacionSeleccionada(habitacion);
+    setShowModalEditar(true);
+  };
+
+  // 2. Refrescar lista cuando el modal termine de editar
+  const handleHabitacionEditada = () => {
+    obtenerHabitaciones();
+  };
+
   return (
     <Container className="my-5">
       <Row className="gap-4 justify-content-center">
-        {/* --------------------------------------
-            COLUMNA IZQUIERDA: FORMULARIO
-        --------------------------------------- */}
+        {/* COLUMNA IZQUIERDA: FORMULARIO CREAR */}
         <Col md={4} className="p-4 border rounded bg-light">
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
-
           <Form onSubmit={handleSubmit(onSubmit)}>
             {/* Número */}
             <Form.Group className="mb-3">
-              <Form.Label>Número de Habitación</Form.Label>
+              <Form.Label>Número</Form.Label>
               <Form.Control
                 type="number"
                 placeholder="Ej: 101"
-                {...register("numero", {
-                  required: "El número de habitación es obligatorio",
-                  min: { value: 1, message: "Debe ser mayor o igual a 1" },
-                  max: { value: 500, message: "Debe ser menor o igual a 500" },
-                })}
+                {...register("numero", { required: "Obligatorio" })}
               />
-              <Form.Text className="text-danger">
-                {errors.numero?.message}
-              </Form.Text>
             </Form.Group>
 
             {/* Tipo */}
             <Form.Group className="mb-3">
-              <Form.Label>Tipo de Habitación</Form.Label>
-              <Form.Select
-                {...register("tipo", {
-                  required: "Debe seleccionar un tipo de habitación",
-                })}
-              >
+              <Form.Label>Tipo</Form.Label>
+              <Form.Select {...register("tipo", { required: "Obligatorio" })}>
                 <option value="">Seleccionar tipo</option>
                 <option value="individual">Individual</option>
                 <option value="doble">Doble</option>
@@ -140,161 +148,66 @@ const AdminHabitaciones = () => {
                 <option value="suite">Suite</option>
                 <option value="familiar">Familiar</option>
               </Form.Select>
-              <Form.Text className="text-danger">
-                {errors.tipo?.message}
-              </Form.Text>
             </Form.Group>
 
             {/* Precio */}
             <Form.Group className="mb-3">
-              <Form.Label>Precio por Noche ($)</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Ej: 150"
-                {...register("precio", {
-                  required: "El precio es obligatorio",
-                  min: { value: 1, message: "Debe ser mayor que 0" },
-                  max: { value: 200000, message: "Máximo permitido: $200.000" },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.precio?.message}
-              </Form.Text>
+              <Form.Label>Precio ($)</Form.Label>
+              <Form.Control type="number" {...register("precio", { required: true })} />
             </Form.Group>
 
             {/* Capacidad */}
             <Form.Group className="mb-3">
-              <Form.Label>Capacidad (Huéspedes)</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Ej: 2"
-                {...register("capacidad", {
-                  required: "La capacidad es obligatoria",
-                  min: { value: 1, message: "Mínimo 1 huésped" },
-                  max: { value: 10, message: "Máximo 10 huéspedes" },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.capacidad?.message}
-              </Form.Text>
+              <Form.Label>Capacidad</Form.Label>
+              <Form.Control type="number" {...register("capacidad", { required: true })} />
             </Form.Group>
 
             {/* Piso */}
             <Form.Group className="mb-3">
               <Form.Label>Piso</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Ej: 3"
-                {...register("piso", {
-                  required: "El piso es obligatorio",
-                  min: { value: 0, message: "Debe ser al menos 0" },
-                  max: { value: 15, message: "Máximo piso permitido: 15" },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.piso?.message}
-              </Form.Text>
+              <Form.Control type="number" {...register("piso", { required: true })} />
             </Form.Group>
 
             {/* Metros */}
             <Form.Group className="mb-3">
-              <Form.Label>Metros Cuadrados</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Ej: 25"
-                {...register("metros", {
-                  required: "Los metros cuadrados son obligatorios",
-                  min: { value: 5, message: "Mínimo 5 m2" },
-                  max: { value: 200, message: "Máximo 200 m2" },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.metros?.message}
-              </Form.Text>
+              <Form.Label>Metros</Form.Label>
+              <Form.Control type="number" {...register("metros", { required: true })} />
             </Form.Group>
 
             {/* Características */}
             <Form.Group className="mb-3">
-              <Form.Label>Características Clave</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ej: Balcón, Smart TV"
-                {...register("caracteristicas", {
-                  required: "Las características son obligatorias",
-                  minLength: { value: 2, message: "Mínimo 2 caracteres" },
-                  maxLength: { value: 80, message: "Máximo 80 caracteres" },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.caracteristicas?.message}
-              </Form.Text>
+              <Form.Label>Características</Form.Label>
+              <Form.Control type="text" {...register("caracteristicas", { required: true })} />
             </Form.Group>
 
             {/* Descripción */}
             <Form.Group className="mb-3">
-              <Form.Label>Descripción Detallada</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Describe la habitación..."
-                {...register("descripcion", {
-                  required: "La descripción es obligatoria",
-                  minLength: {
-                    value: 10,
-                    message: "Debe tener al menos 10 caracteres",
-                  },
-                  maxLength: { value: 500, message: "Máximo 500 caracteres" },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.descripcion?.message}
-              </Form.Text>
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control as="textarea" rows={3} {...register("descripcion", { required: true })} />
             </Form.Group>
 
             {/* Estado */}
             <Form.Group className="mb-3">
               <Form.Label>Estado</Form.Label>
               <div className="d-flex flex-wrap gap-3 mt-2">
-                {[
-                  "disponible",
-                  "ocupada",
-                  "reservada",
-                  "limpieza",
-                  "mantenimiento",
-                ].map((estado) => (
-                  <Form.Check
-                    type="radio"
-                    key={estado}
-                    label={estado.charAt(0).toUpperCase() + estado.slice(1)}
-                    value={estado}
-                    {...register("estado", {
-                      required: "Debe seleccionar un estado",
-                    })}
-                  />
-                ))}
+                {["disponible", "ocupada", "reservada", "mantenimiento"].map(
+                  (estado) => (
+                    <Form.Check
+                      type="radio"
+                      key={estado}
+                      label={estado.charAt(0).toUpperCase() + estado.slice(1)}
+                      value={estado}
+                      {...register("estado", { required: true })}
+                    />
+                  )
+                )}
               </div>
-              <Form.Text className="text-danger">
-                {errors.estado?.message}
-              </Form.Text>
             </Form.Group>
 
             {/* Imagen */}
             <Form.Group className="mb-4">
-              <Form.Label>Foto de la Habitación (URL)</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ej: https://example.com/habitacion.jpg"
-                {...register("imagen", {
-                  required: "Debe proporcionar una imagen",
-                  pattern: {
-                    value: /(https?:\/\/.*\.(?:png|jpg|jpeg|webp|svg))/i,
-                    message: "Debe ser una URL válida de imagen",
-                  },
-                })}
-              />
-              <Form.Text className="text-danger">
-                {errors.imagen?.message}
-              </Form.Text>
+              <Form.Label>Imagen URL</Form.Label>
+              <Form.Control type="text" {...register("imagen", { required: true })} />
             </Form.Group>
 
             <Button variant="primary" type="submit" className="w-100">
@@ -303,22 +216,31 @@ const AdminHabitaciones = () => {
           </Form>
         </Col>
 
-        {/* --------------------------------------
-            COLUMNA DERECHA: LISTADO
-        --------------------------------------- */}
+        {/* COLUMNA DERECHA: LISTADO */}
         <Col md={7} className="p-4 border rounded bg-white">
           <h3 className="mb-4 fw-bold">Habitaciones Existentes</h3>
-          {/* CORRECCIÓN: Usamos 'habitaciones' en lugar de 'habitacionesEjemplo' */}
           {habitaciones.length > 0 ? (
             <CardsHabitaciones
               habitaciones={habitaciones}
               borrarHabitacion={borrarHabitacion}
+              // IMPORTANTE: Aquí pasamos la función para abrir el modal
+              onEditarHabitacion={handleEditarHabitacion} 
             />
           ) : (
-            <p className="text-muted">No hay habitaciones para mostrar.</p>
+            <p className="text-muted">No hay habitaciones registradas.</p>
           )}
         </Col>
       </Row>
+
+      <ModalEditarHabitacion
+        show={showModalEditar}
+        onHide={() => {
+          setShowModalEditar(false);
+          setHabitacionSeleccionada(null);
+        }}
+        habitacion={habitacionSeleccionada}
+        onHabitacionEditada={handleHabitacionEditada}
+      />
     </Container>
   );
 };
