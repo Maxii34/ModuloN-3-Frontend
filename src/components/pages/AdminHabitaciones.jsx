@@ -48,7 +48,7 @@ const AdminHabitaciones = () => {
         imagenes: data.imagenes, 
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
-        metros: parseInt(data.metros),
+        metrosCuadrados: parseInt(data.metrosCuadrados),
         caracteristicas: data.caracteristicas,
         descripcion: data.descripcion,
       };
@@ -126,7 +126,7 @@ const AdminHabitaciones = () => {
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
           <Form onSubmit={handleSubmit(onSubmit)}>
             
-            {/* ... (Inputs de Número, Tipo, Precio, Capacidad, Piso, Metros, Características, Descripción, Estado IGUAL QUE ANTES) ... */}
+            {/* ... (Inputs de Número, Tipo, Precio, Capacidad, Piso, metrosCuadrados, Características, Descripción, Estado IGUAL QUE ANTES) ... */}
             
             <Form.Group className="mb-3">
               <Form.Label>Número</Form.Label>
@@ -161,8 +161,8 @@ const AdminHabitaciones = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Metros</Form.Label>
-              <Form.Control type="number" {...register("metros", { required: true })} />
+              <Form.Label>Metros Cuadrados</Form.Label>
+              <Form.Control type="number" {...register("metrosCuadrados", { required: true })} />
             </Form.Group>
 
             <Form.Group className="mb-3">
