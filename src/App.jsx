@@ -24,7 +24,13 @@ function App() {
   const registerShow = () => setShowRegister(true);
 
 
-  const sessionUsuario = JSON.parse(sessionStorage.getItem("usuarioKey")) || {};
+const storedValue = sessionStorage.getItem("usuarioKey");
+  
+  const sessionUsuario = (
+    storedValue && storedValue !== "undefined" 
+      ? JSON.parse(storedValue)              
+      : {}                                   
+  ); 
   const [usuarioLogueado, setUsuarioLogueado] = useState(sessionUsuario);
   useEffect(() => {
     sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioLogueado));
