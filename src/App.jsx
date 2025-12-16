@@ -2,7 +2,8 @@ import "./index.css";
 import AdminHabitaciones from "./components/pages/AdminHabitaciones";
 import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/DetalleHabitacion";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router";
+import ReservaHabitacion from "./components/pages/ReservaHabitacion";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Inicio } from "./components/pages/Inicio";
 import { QuienesSomos } from "./components/pages/QuienesSomos";
 import { Galeria } from "./components/pages/Galeria";
@@ -124,14 +125,24 @@ function AppRouter({
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
+
               <Route
-                path="/detalle"
+                path="/detalle/:id"
                 element={
                   <ProtectedUserRoute>
                     <DetalleHabitacion />
                   </ProtectedUserRoute>
                 }
               />
+              <Route
+                path="/reserva/:id"
+                element={
+                  <ProtectedUserRoute>
+                    <ReservaHabitacion />
+                  </ProtectedUserRoute>
+                }
+              />
+
               <Route path="/nosotros" element={<QuienesSomos />} />
               <Route path="/galeria" element={<Galeria />} />
               <Route path="/habitaciones" element={<Habitaciones />} />
