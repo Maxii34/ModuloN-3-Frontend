@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { iniciarSesion } from "../helpers/queries";
 import Swal from "sweetalert2";
- 
+
 export const ModalLogin = ({
   showLogin,
   loginClose,
@@ -20,49 +20,59 @@ export const ModalLogin = ({
 
   const navegacion = useNavigate();
 
-
   const RegistrateAki = () => {
-    registerShow();
     loginClose();
+    registerShow();
   };
 
-  const onSubmi = async (data) => {
-    const respuesta = await iniciarSesion(data);
-    if (respuesta && respuesta.status === 200) {
-      const datos = await respuesta.json();
+  const onSubmit = async (data) => {
+    try {
+      const respuesta = await iniciarSesion(data);
 
-      const usuarioData = {
-        usuario: datos.usuario,
-        token: datos.token,
-        tipo: datos.usuario.tipo,
-      };
+      if (respuesta && respuesta.status === 200) {
+        const datos = await respuesta.json();
 
-      setUsuarioLogueado(usuarioData);
+        const usuarioData = {
+          usuario: datos.usuario,
+          token: datos.token,
+          tipo: datos.usuario.tipo,
+        };
 
-      sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
+        setUsuarioLogueado(usuarioData);
+        sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
 
-      Swal.fire({
-        title: "¡Bienvenido!",
-        text: "Has iniciado sesión correctamente.",
-        icon: "success",
-        timer: 2500,
-        showConfirmButton: false,
-        timerProgressBar: true,
-      });
+        loginClose();
+        reset();
 
-      reset();
-      loginClose();
+        await Swal.fire({
+          title: "¡Bienvenido!",
+          text: "Has iniciado sesión correctamente.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          timerProgressBar: true,
+        });
 
-      // Redirigir según tipo
-      if (datos.usuario.tipo === "admin") {
-        navegacion("/admin");
+        // Redirige según el tipo
+        if (datos.usuario.tipo === "usuario") {
+          navegacion("/");
+        } else if (datos.usuario.tipo === "admin") {
+          navegacion("/admin");
+        } else {
+          navegacion("/");
+        }
       } else {
-        navegacion("/");
+        Swal.fire({
+          title: "Ocurrió un error",
+          text: "Credenciales incorrectas",
+          icon: "error",
+        });
       }
-    } else {
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
       Swal.fire({
-        title: "Ocurrió un error",
-        text: "Credenciales incorrectas",
+        title: "Error",
+        text: "Hubo un problema al conectar con el servidor",
         icon: "error",
       });
     }
@@ -72,7 +82,7 @@ export const ModalLogin = ({
     <>
       <Modal show={showLogin} onHide={loginClose}>
         <Modal.Body className="">
-          <Form className=" css-modal-login" onSubmit={handleSubmit(onSubmi)}>
+          <Form className="css-modal-login" onSubmit={handleSubmit(onSubmit)}>
             <div className="text-center mb-2">
               <h1 className="mb-2">Bienvenido</h1>
               <div>
@@ -81,6 +91,7 @@ export const ModalLogin = ({
                 </span>
               </div>
             </div>
+
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
