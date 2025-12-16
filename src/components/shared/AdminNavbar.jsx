@@ -1,15 +1,15 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import "./AdminNavbar.css";
-import { 
-  FaTh, 
-  FaBed, 
-  FaUsers, 
+import {
+  FaTh,
+  FaBed,
+  FaUsers,
   FaCalendarAlt,
   FaSignOutAlt,
-  FaShoppingBag
+  FaShoppingBag,
 } from "react-icons/fa";
 
-const AdminNavbar = ({ onLogout }) => {
+const AdminNavbar = ({ onLogout, setUsuarioLogueado }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -24,6 +24,8 @@ const AdminNavbar = ({ onLogout }) => {
     if (onLogout) {
       onLogout();
     }
+    setUsuarioLogueado({});
+    sessionStorage.removeItem("usuarioKey");
     navigate("/");
   };
 
@@ -41,7 +43,7 @@ const AdminNavbar = ({ onLogout }) => {
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
-          
+
           return (
             <Link
               key={item.path}
@@ -56,7 +58,7 @@ const AdminNavbar = ({ onLogout }) => {
       </div>
 
       <div className="admin-navbar-footer">
-        <button 
+        <button
           className="admin-navbar-item admin-navbar-logout"
           onClick={handleLogout}
         >

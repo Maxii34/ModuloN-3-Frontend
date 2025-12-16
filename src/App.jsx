@@ -82,7 +82,7 @@ function AppRouter({
     <>
       {shouldShowAdminNavbar ? (
         <>
-          <AdminNavbar onLogout={logoutAdmin} />
+          <AdminNavbar onLogout={logoutAdmin} setUsuarioLogueado={setUsuarioLogueado} />
           <div className="admin-layout">
             <main>
               <Routes>
@@ -125,7 +125,7 @@ function AppRouter({
         </>
       ) : (
         <>
-          <Menu loginShow={loginShow} registerShow={registerShow}  />
+          <Menu loginShow={loginShow} registerShow={registerShow} usuarioLogueado={usuarioLogueado} setUsuarioLogueado={setUsuarioLogueado} />
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
