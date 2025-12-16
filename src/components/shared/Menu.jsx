@@ -4,16 +4,30 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import "../../index.css";
 
-const Menu = ({ loginShow, registerShow }) => {
+const Menu = ({
+  loginShow,
+  registerShow,
+  usuarioLogueado,
+  setUsuarioLogueado,
+}) => {
   const navigate = useNavigate();
 
   const abrirLogin = () => {
     loginShow();
   };
-  
+
   const abrirRegister = () => {
     registerShow();
   };
+
+  const cerrarSesion = () => {
+    setUsuarioLogueado({});
+    sessionStorage.removeItem("usuarioKey");
+  };
+
+  const estaLogueado = usuarioLogueado && usuarioLogueado.token;
+  const esAdmin = estaLogueado && usuarioLogueado.tipo === "admin";
+  const esUsuario = estaLogueado && usuarioLogueado.tipo === "usuario";
 
   return (
     <>
@@ -45,48 +59,94 @@ const Menu = ({ loginShow, registerShow }) => {
               <Nav.Link as={Link} to="/" className="nav-link">
                 Inicio
               </Nav.Link>
-              <Nav.Link as={Link} to="/galeria" className="nav-link">
-                Galería
-              </Nav.Link>
               <Nav.Link as={Link} to="/habitaciones" className="nav-link">
                 Habitaciones
               </Nav.Link>
-              <Nav.Link as={Link} to="/contacto" className="nav-link">
-                Contacto
-              </Nav.Link>
+              {esAdmin && (
+                <>
+                  <Nav.Link
+                    as={Link}
+                    to="/admin-dashboard"
+                    className="nav-link"
+                  >
+                    Dashboard
+                  </Nav.Link>
+                  <Nav.Link
+                    as={Link}
+                    to="/admin-habitaciones"
+                    className="nav-link"
+                  >
+                    Habitaciones
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/admin-usuarios" className="nav-link">
+                    Usuarios
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/admin-reservas" className="nav-link">
+                    Reservaciones
+                  </Nav.Link>
+                </>
+              )}
             </Nav>
 
             <div className="d-flex justify-content-center align-items-center">
-              {/* Botón Iniciar Sesión */}
-              <button className="reserve-button blob-btn" onClick={abrirLogin}>
-                Iniciar Sesión
-                <span className="blob-btn__inner">
-                  <span className="blob-btn__blobs">
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
+              {/* Botón Iniciar Sesión - Solo si NO está logueado */}
+              {!estaLogueado && (
+                <button
+                  className="reserve-button blob-btn"
+                  onClick={abrirLogin}
+                >
+                  Iniciar Sesión
+                  <span className="blob-btn__inner">
+                    <span className="blob-btn__blobs">
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                    </span>
                   </span>
-                </span>
-              </button>
-              
-              {/* Botón Registrarse */}
-              <button className="mx-1 reserve-button blob-btn" onClick={abrirRegister}>
-                Registrarse
-                <span className="blob-btn__inner">
-                  <span className="blob-btn__blobs">
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
+                </button>
+              )}
+
+              {/* Botón Registrarse - Solo si NO está logueado */}
+              {!estaLogueado && (
+                <button
+                  className="mx-1 reserve-button blob-btn"
+                  onClick={abrirRegister}
+                >
+                  Registrarse
+                  <span className="blob-btn__inner">
+                    <span className="blob-btn__blobs">
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                    </span>
                   </span>
-                </span>
-              </button>
-              
-              {/* Botón de reserva */}
-              <button 
+                </button>
+              )}
+
+              {/* Botón Cerrar Sesión - Solo si SÍ está logueado */}
+              {estaLogueado && (
+                <button
+                  className="mx-1 reserve-button blob-btn"
+                  onClick={cerrarSesion}
+                >
+                  Cerrar Sesión
+                  <span className="blob-btn__inner">
+                    <span className="blob-btn__blobs">
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                    </span>
+                  </span>
+                </button>
+              )}
+
+              {/* Botón de reserva - Siempre visible */}
+              <button
                 className="reserve-button blob-btn"
-                onClick={() => navigate('/habitaciones')}
+                onClick={() => navigate("/habitaciones")}
               >
                 Reservar Ahora
                 <span className="blob-btn__inner">

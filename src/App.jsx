@@ -125,7 +125,7 @@ function AppRouter({
         </>
       ) : (
         <>
-          <Menu loginShow={loginShow} registerShow={registerShow}  />
+          <Menu loginShow={loginShow} registerShow={registerShow} usuarioLogueado={usuarioLogueado} setUsuarioLogueado={setUsuarioLogueado} />
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
