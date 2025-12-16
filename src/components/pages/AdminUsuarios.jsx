@@ -54,7 +54,7 @@ const AdminUsuarios = () => {
         <Col>
           <h2 className="fw-bold mb-1">Administración de Usuarios</h2>
           <p className="text-muted mb-0">
-            Gestiona el acceso y permisos de los usuarios del sistema.
+            Controlá las reservas de tu hotel y los usuarios del sistema
           </p>
         </Col>
       </Row>

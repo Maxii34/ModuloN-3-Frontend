@@ -1,91 +1,141 @@
-import { Button, Form, Modal } from "react-bootstrap";
 import { useState } from "react";
+import { Button, Modal, Badge, Card } from "react-bootstrap";
 
 const UserRow = ({ usuario }) => {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
+      {/* FILA */}
       <tr>
-        <td>
-          <Form.Check />
-        </td>
+        <td className="d-flex align-items-center gap-2">
+          <div
+          className={`rounded-circle d-flex align-items-center justify-content-center
+            bg-${usuario.tipo === "admin" ? "primary" : "secondary"}
+            text-white`}
+          style={{ width: 40, height: 40 }}
+        >
+          <i className="bi bi-person-fill"></i>
+        </div>
 
-        <td>
-          <div className="d-flex align-items-center gap-3">
-            <img
-              src={usuario.avatar}
-              alt={usuario.nombre}
-              width={40}
-              height={40}
-              className="rounded-circle"
-            />
-            <span className="fw-semibold">
+          <div>
+            <div className="fw-semibold">
               {usuario.nombre} {usuario.apellido}
-            </span>
+            </div>
           </div>
         </td>
 
-        <td className="text-muted">{usuario.email}</td>
+        <td>{usuario.email}</td>
 
-        <td className="text-capitalize">
-          {usuario.tipo === "admin" ? "Administrador" : "Usuario"}
+        <td>
+          <Badge bg={usuario.tipo === "admin" ? "primary" : "secondary"}>
+            {usuario.tipo}
+          </Badge>
         </td>
 
-        {/* ACCIONES */}
-        <td className="text-end">
-          <div className="d-flex justify-content-end gap-2">
-            <Button
-              variant="outline-primary"
-              size="sm"
-              onClick={() => setShowModal(true)}
-            >
-              <i className="bi bi-eye"></i>
-            </Button>
+        <td className="text-center">
+          <Button
+            variant="outline-primary"
+            size="sm"
+            className="me-2"
+            onClick={() => setShowModal(true)}
+          >
+            <i className="bi bi-eye"></i>
+          </Button>
 
-            <Button variant="outline-danger" size="sm">
-              <i className="bi bi-trash"></i>
-            </Button>
-          </div>
+          <Button
+            variant="outline-danger"
+            size="sm"
+          >
+            <i className="bi bi-trash"></i>
+          </Button>
         </td>
       </tr>
 
-      {/* MODAL INFO USUARIO */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      {/* MODAL */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        size="lg"
+      >
         <Modal.Header closeButton>
-          <Modal.Title>Información del Usuario</Modal.Title>
+          <Modal.Title className="fw-bold">
+            Información del Usuario
+          </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
-          <div className="text-center mb-3">
-            <img
-              src={usuario.avatar}
-              alt={usuario.nombre}
-              width={80}
-              height={80}
-              className="rounded-circle mb-2"
-            />
-            <h5 className="mb-0">
-              {usuario.nombre} {usuario.apellido}
-            </h5>
-            <small className="text-muted">{usuario.email}</small>
+          {/* INFO USUARIO */}
+          <div className="d-flex gap-4 align-items-start mb-4">
+            <div
+              className={`rounded-circle d-flex align-items-center justify-content-center
+                bg-${usuario.tipo === "admin" ? "primary" : "secondary"}
+                text-white`}
+              style={{ width: 40, height: 40 }}
+            >
+              <i className="bi bi-person-fill"></i>
+            </div>
+
+
+            <div className="flex-grow-1">
+              <h5 className="fw-bold mb-1">
+                {usuario.nombre} {usuario.apellido}
+              </h5>
+
+              <p className="text-muted mb-2">{usuario.email}</p>
+
+              <Badge
+                bg={usuario.tipo === "admin" ? "primary" : "secondary"}
+              >
+                {usuario.tipo}
+              </Badge>
+
+              <div className="row small mt-3">
+                <div className="col-md-6 mb-2">
+                  <strong>Teléfono:</strong>{" "}
+                  {usuario.telefono || "—"}
+                </div>
+                <div className="col-md-6 mb-2">
+                  <strong>Registrado:</strong>{" "}
+                  {usuario.createdAt
+                    ? new Date(usuario.createdAt).toLocaleDateString()
+                    : "—"}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <hr />
+          {/* HABITACIÓN EJEMPLO SOLO USUARIO */}
+          {usuario.tipo === "usuario" && (
+            <>
+              <hr />
+              <h6 className="fw-bold mb-3">
+                Habitación Reservada
+              </h6>
 
-          <p>
-            <strong>Rol:</strong>{" "}
-            {usuario.tipo === "admin" ? "Administrador" : "Usuario"}
-          </p>
+              <Card className="shadow-sm">
+                <Card.Body>
+                  <div className="d-flex justify-content-between mb-2">
+                    <strong>Habitación 204</strong>
+                    <Badge bg="primary">Doble</Badge>
+                  </div>
 
-          {/* A futuro */}
-          <p>
-            <strong>ID:</strong> {usuario.id}
-          </p>
+                  <div className="small text-muted">
+                    <div>Precio por noche: $220</div>
+                    <div>Estado: Disponible</div>
+                  </div>
+                </Card.Body>
+              </Card>
+            </>
+          )}
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModal(false)}
+          >
             Cerrar
           </Button>
         </Modal.Footer>
