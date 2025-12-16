@@ -82,7 +82,7 @@ function AppRouter({
     <>
       {shouldShowAdminNavbar ? (
         <>
-          <AdminNavbar onLogout={logoutAdmin} />
+          <AdminNavbar onLogout={logoutAdmin} setUsuarioLogueado={setUsuarioLogueado} />
           <div className="admin-layout">
             <main>
               <Routes>

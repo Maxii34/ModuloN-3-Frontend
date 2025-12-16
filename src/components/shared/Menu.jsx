@@ -3,6 +3,7 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import "../../index.css";
+import { useAuth } from "../../context/AuthContext";
 
 const Menu = ({
   loginShow,
@@ -11,6 +12,7 @@ const Menu = ({
   setUsuarioLogueado,
 }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const abrirLogin = () => {
     loginShow();
@@ -20,14 +22,14 @@ const Menu = ({
     registerShow();
   };
 
-  const cerrarSesion = () => {
-    setUsuarioLogueado({});
-    sessionStorage.removeItem("usuarioKey");
-  };
+  const cerrarSesion = () => {  
+  setUsuarioLogueado({});
+  sessionStorage.removeItem("usuarioKey");
+  logout(); 
+  navigate("/");
+};
 
   const estaLogueado = usuarioLogueado && usuarioLogueado.token;
-  const esAdmin = estaLogueado && usuarioLogueado.tipo === "admin";
-  const esUsuario = estaLogueado && usuarioLogueado.tipo === "usuario";
 
   return (
     <>
@@ -62,30 +64,7 @@ const Menu = ({
               <Nav.Link as={Link} to="/habitaciones" className="nav-link">
                 Habitaciones
               </Nav.Link>
-              {esAdmin && (
-                <>
-                  <Nav.Link
-                    as={Link}
-                    to="/admin-dashboard"
-                    className="nav-link"
-                  >
-                    Dashboard
-                  </Nav.Link>
-                  <Nav.Link
-                    as={Link}
-                    to="/admin-habitaciones"
-                    className="nav-link"
-                  >
-                    Habitaciones
-                  </Nav.Link>
-                  <Nav.Link as={Link} to="/admin-usuarios" className="nav-link">
-                    Usuarios
-                  </Nav.Link>
-                  <Nav.Link as={Link} to="/admin-reservas" className="nav-link">
-                    Reservaciones
-                  </Nav.Link>
-                </>
-              )}
+              
             </Nav>
 
             <div className="d-flex justify-content-center align-items-center">

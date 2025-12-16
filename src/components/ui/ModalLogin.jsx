@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { iniciarSesion } from "../helpers/queries";
 import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext"; // Importa useAuth
 
 export const ModalLogin = ({
   showLogin,
@@ -19,6 +20,7 @@ export const ModalLogin = ({
   } = useForm();
 
   const navegacion = useNavigate();
+  const { loginAdmin, loginUser } = useAuth(); // Obtén las funciones del contexto
 
   const RegistrateAki = () => {
     loginClose();
@@ -38,8 +40,16 @@ export const ModalLogin = ({
           tipo: datos.usuario.tipo,
         };
 
+        // Actualiza el estado local
         setUsuarioLogueado(usuarioData);
         sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
+
+        // Actualiza el AuthContext según el tipo de usuario
+        if (datos.usuario.tipo === "admin") {
+          loginAdmin(usuarioData); // Actualiza el contexto para admin
+        } else if (datos.usuario.tipo === "usuario") {
+          loginUser(usuarioData); // Actualiza el contexto para usuario
+        }
 
         loginClose();
         reset();
@@ -54,10 +64,8 @@ export const ModalLogin = ({
         });
 
         // Redirige según el tipo
-        if (datos.usuario.tipo === "usuario") {
-          navegacion("/");
-        } else if (datos.usuario.tipo === "admin") {
-          navegacion("/admin");
+        if (datos.usuario.tipo === "admin") {
+          navegacion("/admin-dashboard");
         } else {
           navegacion("/");
         }
