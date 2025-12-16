@@ -6,7 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
 import ModalEditarHabitacion from "../ui/ModalEditarHabitacion";
-import { obtenerHabitaciones, crearHabitacion, eliminarHabitacion } from "../../services/habitacionesAPI";
+import { obtenerHabitaciones, crearHabitacion, eliminarHabitacion, editarHabitacion } from "../../services/habitacionesAPI";
 
 const AdminHabitaciones = () => {
   const [habitaciones, setHabitaciones] = useState([]);

@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
+import { iniciarSesion } from "../../services/usuariosAPI";
+import Swal from "sweetalert2";
 
 export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
   const {
@@ -13,33 +16,57 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
   } = useForm();
   const { loginAdmin, loginUser } = useAuth();
   const navigate = useNavigate();
+  const [cargando, setCargando] = useState(false);
 
   const RegistrateAki = () => {
     registerShow();
     loginClose();
   };
 
-  const onSubmi = (data) => {
-    console.log(data);
-    // Si el email contiene "admin", activar el estado de admin
-    // En producción, esto debería venir del backend
-    if (data.email.toLowerCase().includes("admin")) {
-      loginAdmin({
-        email: data.email,
-        tipo: "admin",
+  const onSubmi = async (data) => {
+    try {
+      setCargando(true);
+      const respuesta = await iniciarSesion(data.email, data.password);
+      
+      // Guardar token y datos del usuario
+      const datosUsuario = {
+        email: respuesta.usuario.email,
+        tipo: respuesta.usuario.tipo,
+        nombre: respuesta.usuario.nombre,
+        apellido: respuesta.usuario.apellido,
+        id: respuesta.usuario.id,
+        token: respuesta.token,
+      };
+
+      if (respuesta.usuario.tipo === "admin") {
+        loginAdmin(datosUsuario);
+        loginClose();
+        navigate("/admin-dashboard");
+      } else {
+        loginUser(datosUsuario);
+        loginClose();
+        navigate("/");
+      }
+
+      Swal.fire({
+        title: "¡Bienvenido!",
+        text: respuesta.mensaje || "Inicio de sesión exitoso",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
       });
-      loginClose();
-      navigate("/admin-dashboard");
-    } else {
-      // Lógica para usuario normal
-      loginUser({
-        email: data.email,
-        tipo: "usuario",
+
+      reset();
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message || "No se pudo iniciar sesión",
+        icon: "error",
+        confirmButtonText: "Aceptar",
       });
-      loginClose();
-      navigate("/");
+    } finally {
+      setCargando(false);
     }
-    reset();
   };
 
   return (
@@ -102,8 +129,19 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
               </Link>
             </div>
 
-            <Button variant="primary" type="submit" className="w-100">
-              Iniciar Sesión
+            <Button variant="primary" type="submit" className="w-100" disabled={cargando}>
+              {cargando ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Iniciando sesión...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </Button>
           </Form>
         </Modal.Body>
