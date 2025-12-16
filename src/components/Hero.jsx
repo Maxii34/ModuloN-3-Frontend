@@ -76,18 +76,19 @@ function Hero() {
           </div>
           
           <div className="form-group">
-            <label htmlFor="guests">Huéspedes</label>
-            <div className="input-wrapper">
-              <select id="guests" className="form-input">
-                <option value="2">2 Huéspedes</option>
-                <option value="1">1 Huésped</option>
-                <option value="3">3 Huéspedes</option>
-                <option value="4">4 Huéspedes</option>
-                <option value="5">5+ Huéspedes</option>
-              </select>
-              <span className="input-icon">▼</span>
-            </div>
-          </div>
+  <label htmlFor="guests">Huéspedes</label>
+  <div className="input-wrapper">
+    <select id="guests" className="form-input">
+      <option value="">Seleccionar huéspedes</option>
+      <option value="1">1 Huésped</option>
+      <option value="2">2 Huéspedes</option>
+      <option value="3">3 Huéspedes</option>
+      <option value="4">4 Huéspedes</option>
+      <option value="5">5+ Huéspedes</option>
+    </select>
+    <span className="input-icon">▼</span>
+  </div>
+</div>
           
           <button 
             className="booking-button"
