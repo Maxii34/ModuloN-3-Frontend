@@ -13,7 +13,7 @@ import Menu from "./components/shared/Menu";
 import AdminNavbar from "./components/shared/AdminNavbar";
 import { ModalLogin } from "./components/ui/ModalLogin";
 import { ModalRegister } from "./components/ui/ModalRegister";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Error404 from "./components/pages/Error404";
 import AdminUsuarios from "./components/pages/AdminUsuarios";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -28,6 +28,15 @@ function AppContent() {
   const [showRegister, setShowRegister] = useState(false);
   const registerClose = () => setShowRegister(false);
   const registerShow = () => setShowRegister(true);
+
+  const storedValue = sessionStorage.getItem("usuarioKey");
+
+  const sessionUsuario =
+    storedValue && storedValue !== "undefined" ? JSON.parse(storedValue) : {};
+  const [usuarioLogueado, setUsuarioLogueado] = useState(sessionUsuario);
+  useEffect(() => {
+    sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioLogueado));
+  }, [usuarioLogueado]);
 
   const { isAdmin, logoutAdmin } = useAuth();
 
@@ -112,7 +121,7 @@ function AppRouter({
         </>
       ) : (
         <>
-          <Menu loginShow={loginShow} registerShow={registerShow} />
+          <Menu loginShow={loginShow} registerShow={registerShow}  />
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
