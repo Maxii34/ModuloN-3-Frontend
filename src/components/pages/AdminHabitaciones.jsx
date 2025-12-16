@@ -16,12 +16,12 @@ const AdminHabitaciones = () => {
   } = useForm();
 
   const [habitaciones, setHabitaciones] = useState([]);
-  
-  // 2. ESTADOS PARA EL MODAL (Tal cual los tenía tu amigo)
+
+  // ESTADOS PARA EL MODAL
   const [showModalEditar, setShowModalEditar] = useState(false);
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
 
-  // --- LEER (GET) ---
+  // LEER (GET)
   const obtenerHabitaciones = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/api/habitaciones");
@@ -36,7 +36,7 @@ const AdminHabitaciones = () => {
     obtenerHabitaciones();
   }, []);
 
-  // --- CREAR (POST) ---
+  // CREAR (POST)
   const onSubmit = async (data) => {
     try {
       const habitacionNueva = {
@@ -44,10 +44,10 @@ const AdminHabitaciones = () => {
         tipo: data.tipo,
         precio: parseFloat(data.precio),
         estado: data.estado,
-        imagen: data.imagen,
+        imagenes: data.imagenes,
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
-        metros: parseInt(data.metros),
+        metrosCuadrados: parseInt(data.metrosCuadrados),
         caracteristicas: data.caracteristicas,
         descripcion: data.descripcion,
       };
@@ -75,7 +75,7 @@ const AdminHabitaciones = () => {
     }
   };
 
-  // --- BORRAR (DELETE) ---
+  // BORRAR (DELETE)
   const borrarHabitacion = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
@@ -94,7 +94,9 @@ const AdminHabitaciones = () => {
           );
 
           if (response.ok) {
-            setHabitaciones(habitaciones.filter((hab) => (hab._id || hab.id) !== id));
+            setHabitaciones(
+              habitaciones.filter((hab) => (hab._id || hab.id) !== id)
+            );
             Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
           } else {
             Swal.fire("Error", "No se pudo eliminar.", "error");
@@ -107,15 +109,12 @@ const AdminHabitaciones = () => {
     });
   };
 
-  // LÓGICA DEL MODAL 
-  
-  // 1. Abrir modal con los datos de la habitación
+  // LÓGICA DEL MODAL
   const handleEditarHabitacion = (habitacion) => {
     setHabitacionSeleccionada(habitacion);
     setShowModalEditar(true);
   };
 
-  // 2. Refrescar lista cuando el modal termine de editar
   const handleHabitacionEditada = () => {
     obtenerHabitaciones();
   };
@@ -127,7 +126,6 @@ const AdminHabitaciones = () => {
         <Col md={4} className="p-4 border rounded bg-light">
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            {/* Número */}
             <Form.Group className="mb-3">
               <Form.Label>Número</Form.Label>
               <Form.Control
@@ -137,7 +135,6 @@ const AdminHabitaciones = () => {
               />
             </Form.Group>
 
-            {/* Tipo */}
             <Form.Group className="mb-3">
               <Form.Label>Tipo</Form.Label>
               <Form.Select {...register("tipo", { required: "Obligatorio" })}>
@@ -150,43 +147,55 @@ const AdminHabitaciones = () => {
               </Form.Select>
             </Form.Group>
 
-            {/* Precio */}
             <Form.Group className="mb-3">
               <Form.Label>Precio ($)</Form.Label>
-              <Form.Control type="number" {...register("precio", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("precio", { required: true })}
+              />
             </Form.Group>
 
-            {/* Capacidad */}
             <Form.Group className="mb-3">
               <Form.Label>Capacidad</Form.Label>
-              <Form.Control type="number" {...register("capacidad", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("capacidad", { required: true })}
+              />
             </Form.Group>
 
-            {/* Piso */}
             <Form.Group className="mb-3">
               <Form.Label>Piso</Form.Label>
-              <Form.Control type="number" {...register("piso", { required: true })} />
+              <Form.Control
+                type="number"
+                {...register("piso", { required: true })}
+              />
             </Form.Group>
 
-            {/* Metros */}
             <Form.Group className="mb-3">
-              <Form.Label>Metros</Form.Label>
-              <Form.Control type="number" {...register("metros", { required: true })} />
+              <Form.Label>Metros Cuadrados</Form.Label>
+              <Form.Control
+                type="number"
+                {...register("metrosCuadrados", { required: true })}
+              />
             </Form.Group>
 
-            {/* Características */}
             <Form.Group className="mb-3">
               <Form.Label>Características</Form.Label>
-              <Form.Control type="text" {...register("caracteristicas", { required: true })} />
+              <Form.Control
+                type="text"
+                {...register("caracteristicas", { required: true })}
+              />
             </Form.Group>
 
-            {/* Descripción */}
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
-              <Form.Control as="textarea" rows={3} {...register("descripcion", { required: true })} />
+              <Form.Control
+                as="textarea"
+                rows={3}
+                {...register("descripcion", { required: true })}
+              />
             </Form.Group>
 
-            {/* Estado */}
             <Form.Group className="mb-3">
               <Form.Label>Estado</Form.Label>
               <div className="d-flex flex-wrap gap-3 mt-2">
@@ -204,10 +213,13 @@ const AdminHabitaciones = () => {
               </div>
             </Form.Group>
 
-            {/* Imagen */}
+            {/* CAMBIO 2: Input para 'imagenes' */}
             <Form.Group className="mb-4">
               <Form.Label>Imagen URL</Form.Label>
-              <Form.Control type="text" {...register("imagen", { required: true })} />
+              <Form.Control
+                type="text"
+                {...register("imagenes", { required: true })}
+              />
             </Form.Group>
 
             <Button variant="primary" type="submit" className="w-100">
@@ -223,8 +235,7 @@ const AdminHabitaciones = () => {
             <CardsHabitaciones
               habitaciones={habitaciones}
               borrarHabitacion={borrarHabitacion}
-              // IMPORTANTE: Aquí pasamos la función para abrir el modal
-              onEditarHabitacion={handleEditarHabitacion} 
+              onEditarHabitacion={handleEditarHabitacion}
             />
           ) : (
             <p className="text-muted">No hay habitaciones registradas.</p>

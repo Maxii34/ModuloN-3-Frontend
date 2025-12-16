@@ -2,7 +2,8 @@ import "./index.css";
 import AdminHabitaciones from "./components/pages/AdminHabitaciones";
 import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/DetalleHabitacion";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router";
+import ReservaHabitacion from "./components/pages/ReservaHabitacion";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Inicio } from "./components/pages/Inicio";
 import { QuienesSomos } from "./components/pages/QuienesSomos";
 import { Galeria } from "./components/pages/Galeria";
@@ -33,7 +34,7 @@ function AppContent() {
   return (
     <>
       <BrowserRouter>
-        <AppRouter 
+        <AppRouter
           isAdmin={isAdmin}
           logoutAdmin={logoutAdmin}
           loginShow={loginShow}
@@ -48,18 +49,18 @@ function AppContent() {
   );
 }
 
-function AppRouter({ 
-  isAdmin, 
-  logoutAdmin, 
-  loginShow, 
+function AppRouter({
+  isAdmin,
+  logoutAdmin,
+  loginShow,
   registerShow,
   showLogin,
   loginClose,
   registerClose,
-  showRegister
+  showRegister,
 }) {
   const location = useLocation();
-  
+
   // Mostrar navbar admin solo si está autenticado como admin
   const isAdminRoute = location.pathname.startsWith("/admin-");
   const shouldShowAdminNavbar = isAdmin && isAdminRoute;
@@ -72,37 +73,37 @@ function AppRouter({
           <div className="admin-layout">
             <main>
               <Routes>
-                <Route 
-                  path="/admin-dashboard" 
+                <Route
+                  path="/admin-dashboard"
                   element={
                     <ProtectedAdminRoute>
                       <AdminHabitaciones />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/admin-habitaciones" 
+                <Route
+                  path="/admin-habitaciones"
                   element={
                     <ProtectedAdminRoute>
                       <AdminHabitaciones />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/admin-usuarios" 
+                <Route
+                  path="/admin-usuarios"
                   element={
                     <ProtectedAdminRoute>
                       <AdminUsuarios />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/admin-reservas" 
+                <Route
+                  path="/admin-reservas"
                   element={
                     <ProtectedAdminRoute>
                       <AdminHabitaciones />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
                 <Route path="/*" element={<Error404 />} />
               </Routes>
@@ -115,14 +116,24 @@ function AppRouter({
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
-              <Route 
-                path="/detalle" 
+
+              <Route
+                path="/detalle/:id"
                 element={
                   <ProtectedUserRoute>
                     <DetalleHabitacion />
                   </ProtectedUserRoute>
-                } 
+                }
               />
+              <Route
+                path="/reserva/:id"
+                element={
+                  <ProtectedUserRoute>
+                    <ReservaHabitacion />
+                  </ProtectedUserRoute>
+                }
+              />
+
               <Route path="/nosotros" element={<QuienesSomos />} />
               <Route path="/galeria" element={<Galeria />} />
               <Route path="/habitaciones" element={<Habitaciones />} />
@@ -133,12 +144,12 @@ function AppRouter({
           <Footer />
         </>
       )}
-      <ModalLogin 
+      <ModalLogin
         showLogin={showLogin}
         loginClose={loginClose}
         registerShow={registerShow}
       />
-      <ModalRegister 
+      <ModalRegister
         showRegister={showRegister}
         registerClose={registerClose}
         loginShow={loginShow}
