@@ -52,6 +52,8 @@ function AppContent() {
           loginClose={loginClose}
           registerClose={registerClose}
           showRegister={showRegister}
+          usuarioLogueado={usuarioLogueado}
+          setUsuarioLogueado={setUsuarioLogueado}
         />
       </BrowserRouter>
     </>
@@ -67,6 +69,8 @@ function AppRouter({
   loginClose,
   registerClose,
   showRegister,
+  usuarioLogueado,
+  setUsuarioLogueado,
 }) {
   const location = useLocation();
 
@@ -157,6 +161,7 @@ function AppRouter({
         showLogin={showLogin}
         loginClose={loginClose}
         registerShow={registerShow}
+        setUsuarioLogueado={setUsuarioLogueado}
       />
       <ModalRegister
         showRegister={showRegister}
