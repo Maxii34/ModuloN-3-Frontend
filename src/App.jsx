@@ -2,7 +2,8 @@ import "./index.css";
 import AdminHabitaciones from "./components/pages/AdminHabitaciones";
 import Footer from "./components/shared/Footer";
 import DetalleHabitacion from "./components/pages/DetalleHabitacion";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router";
+import ReservaHabitacion from "./components/pages/ReservaHabitacion";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Inicio } from "./components/pages/Inicio";
 import { QuienesSomos } from "./components/pages/QuienesSomos";
 import { Galeria } from "./components/pages/Galeria";
@@ -12,7 +13,7 @@ import Menu from "./components/shared/Menu";
 import AdminNavbar from "./components/shared/AdminNavbar";
 import { ModalLogin } from "./components/ui/ModalLogin";
 import { ModalRegister } from "./components/ui/ModalRegister";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Error404 from "./components/pages/Error404";
 import AdminUsuarios from "./components/pages/AdminUsuarios";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -28,12 +29,21 @@ function AppContent() {
   const registerClose = () => setShowRegister(false);
   const registerShow = () => setShowRegister(true);
 
+  const storedValue = sessionStorage.getItem("usuarioKey");
+
+  const sessionUsuario =
+    storedValue && storedValue !== "undefined" ? JSON.parse(storedValue) : {};
+  const [usuarioLogueado, setUsuarioLogueado] = useState(sessionUsuario);
+  useEffect(() => {
+    sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioLogueado));
+  }, [usuarioLogueado]);
+
   const { isAdmin, logoutAdmin } = useAuth();
 
   return (
     <>
       <BrowserRouter>
-        <AppRouter 
+        <AppRouter
           isAdmin={isAdmin}
           logoutAdmin={logoutAdmin}
           loginShow={loginShow}
@@ -42,24 +52,28 @@ function AppContent() {
           loginClose={loginClose}
           registerClose={registerClose}
           showRegister={showRegister}
+          usuarioLogueado={usuarioLogueado}
+          setUsuarioLogueado={setUsuarioLogueado}
         />
       </BrowserRouter>
     </>
   );
 }
 
-function AppRouter({ 
-  isAdmin, 
-  logoutAdmin, 
-  loginShow, 
+function AppRouter({
+  isAdmin,
+  logoutAdmin,
+  loginShow,
   registerShow,
   showLogin,
   loginClose,
   registerClose,
-  showRegister
+  showRegister,
+  usuarioLogueado,
+  setUsuarioLogueado,
 }) {
   const location = useLocation();
-  
+
   // Mostrar navbar admin solo si está autenticado como admin
   const isAdminRoute = location.pathname.startsWith("/admin-");
   const shouldShowAdminNavbar = isAdmin && isAdminRoute;
@@ -68,41 +82,41 @@ function AppRouter({
     <>
       {shouldShowAdminNavbar ? (
         <>
-          <AdminNavbar onLogout={logoutAdmin} />
+          <AdminNavbar onLogout={logoutAdmin} setUsuarioLogueado={setUsuarioLogueado} />
           <div className="admin-layout">
             <main>
               <Routes>
-                <Route 
-                  path="/admin-dashboard" 
+                <Route
+                  path="/admin-dashboard"
                   element={
                     <ProtectedAdminRoute>
                       <AdminHabitaciones />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/admin-habitaciones" 
+                <Route
+                  path="/admin-habitaciones"
                   element={
                     <ProtectedAdminRoute>
                       <AdminHabitaciones />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/admin-usuarios" 
+                <Route
+                  path="/admin-usuarios"
                   element={
                     <ProtectedAdminRoute>
                       <AdminUsuarios />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/admin-reservas" 
+                <Route
+                  path="/admin-reservas"
                   element={
                     <ProtectedAdminRoute>
                       <AdminHabitaciones />
                     </ProtectedAdminRoute>
-                  } 
+                  }
                 />
                 <Route path="/*" element={<Error404 />} />
               </Routes>
@@ -111,18 +125,28 @@ function AppRouter({
         </>
       ) : (
         <>
-          <Menu loginShow={loginShow} registerShow={registerShow} />
+          <Menu loginShow={loginShow} registerShow={registerShow} usuarioLogueado={usuarioLogueado} setUsuarioLogueado={setUsuarioLogueado} />
           <main>
             <Routes>
               <Route path="/" element={<Inicio />} />
-              <Route 
-                path="/detalle" 
+
+              <Route
+                path="/detalle/:id"
                 element={
                   <ProtectedUserRoute>
                     <DetalleHabitacion />
                   </ProtectedUserRoute>
-                } 
+                }
               />
+              <Route
+                path="/reserva/:id"
+                element={
+                  <ProtectedUserRoute>
+                    <ReservaHabitacion />
+                  </ProtectedUserRoute>
+                }
+              />
+
               <Route path="/nosotros" element={<QuienesSomos />} />
               <Route path="/galeria" element={<Galeria />} />
               <Route path="/habitaciones" element={<Habitaciones />} />
@@ -133,12 +157,13 @@ function AppRouter({
           <Footer />
         </>
       )}
-      <ModalLogin 
+      <ModalLogin
         showLogin={showLogin}
         loginClose={loginClose}
         registerShow={registerShow}
+        setUsuarioLogueado={setUsuarioLogueado}
       />
-      <ModalRegister 
+      <ModalRegister
         showRegister={showRegister}
         registerClose={registerClose}
         loginShow={loginShow}

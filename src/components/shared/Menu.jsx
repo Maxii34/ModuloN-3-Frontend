@@ -3,17 +3,33 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import "../../index.css";
+import { useAuth } from "../../context/AuthContext";
 
-const Menu = ({ loginShow, registerShow }) => {
+const Menu = ({
+  loginShow,
+  registerShow,
+  usuarioLogueado,
+  setUsuarioLogueado,
+}) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const abrirLogin = () => {
     loginShow();
   };
-  
+
   const abrirRegister = () => {
     registerShow();
   };
+
+  const cerrarSesion = () => {  
+  setUsuarioLogueado({});
+  sessionStorage.removeItem("usuarioKey");
+  logout(); 
+  navigate("/");
+};
+
+  const estaLogueado = usuarioLogueado && usuarioLogueado.token;
 
   return (
     <>
@@ -45,48 +61,71 @@ const Menu = ({ loginShow, registerShow }) => {
               <Nav.Link as={Link} to="/" className="nav-link">
                 Inicio
               </Nav.Link>
-              <Nav.Link as={Link} to="/galeria" className="nav-link">
-                Galería
-              </Nav.Link>
               <Nav.Link as={Link} to="/habitaciones" className="nav-link">
                 Habitaciones
               </Nav.Link>
-              <Nav.Link as={Link} to="/contacto" className="nav-link">
-                Contacto
-              </Nav.Link>
+              
             </Nav>
 
             <div className="d-flex justify-content-center align-items-center">
-              {/* Botón Iniciar Sesión */}
-              <button className="reserve-button blob-btn" onClick={abrirLogin}>
-                Iniciar Sesión
-                <span className="blob-btn__inner">
-                  <span className="blob-btn__blobs">
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
+              {/* Botón Iniciar Sesión - Solo si NO está logueado */}
+              {!estaLogueado && (
+                <button
+                  className="reserve-button blob-btn"
+                  onClick={abrirLogin}
+                >
+                  Iniciar Sesión
+                  <span className="blob-btn__inner">
+                    <span className="blob-btn__blobs">
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                    </span>
                   </span>
-                </span>
-              </button>
-              
-              {/* Botón Registrarse */}
-              <button className="mx-1 reserve-button blob-btn" onClick={abrirRegister}>
-                Registrarse
-                <span className="blob-btn__inner">
-                  <span className="blob-btn__blobs">
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
+                </button>
+              )}
+
+              {/* Botón Registrarse - Solo si NO está logueado */}
+              {!estaLogueado && (
+                <button
+                  className="mx-1 reserve-button blob-btn"
+                  onClick={abrirRegister}
+                >
+                  Registrarse
+                  <span className="blob-btn__inner">
+                    <span className="blob-btn__blobs">
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                    </span>
                   </span>
-                </span>
-              </button>
-              
-              {/* Botón de reserva */}
-              <button 
+                </button>
+              )}
+
+              {/* Botón Cerrar Sesión - Solo si SÍ está logueado */}
+              {estaLogueado && (
+                <button
+                  className="mx-1 reserve-button blob-btn"
+                  onClick={cerrarSesion}
+                >
+                  Cerrar Sesión
+                  <span className="blob-btn__inner">
+                    <span className="blob-btn__blobs">
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                      <span className="blob-btn__blob"></span>
+                    </span>
+                  </span>
+                </button>
+              )}
+
+              {/* Botón de reserva - Siempre visible */}
+              <button
                 className="reserve-button blob-btn"
-                onClick={() => navigate('/habitaciones')}
+                onClick={() => navigate("/habitaciones")}
               >
                 Reservar Ahora
                 <span className="blob-btn__inner">

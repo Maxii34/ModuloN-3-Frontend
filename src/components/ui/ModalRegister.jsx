@@ -2,7 +2,8 @@ import { Button, Modal, Form, Row, Col } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "../../context/AuthContext";
+import { registrarUsuario } from "../helpers/queries";
+import Swal from "sweetalert2";
 
 export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
   const {
@@ -11,39 +12,75 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
     reset,
     formState: { errors },
   } = useForm();
-  const { loginAdmin, loginUser } = useAuth();
   const navigate = useNavigate();
 
-  const iniciarSesion = () => {
-    loginShow();
+  const iniciar = () => {
     registerClose();
+    loginShow();
   };
 
-  const onSubmi = (data) => {
-    console.log(data);
-    // Si el tipo de usuario es admin, activar el estado de admin
-    if (data.tipoUsuario === "admin") {
-      loginAdmin({
-        nombre: data.nombre,
-        apellido: data.apellido,
-        email: data.email,
-        tipo: "admin",
-      });
-      registerClose();
-      navigate("/admin-dashboard");
-    } else {
-      // Lógica para usuario normal
-      loginUser({
+  const onSubmit = async (data) => {
+    try {
+      const nuevoUsuario = {
         nombre: data.nombre,
         apellido: data.apellido,
         email: data.email,
         telefono: data.telefono,
-        tipo: "usuario",
-      });
+        password: data.password,
+        tipo: "usuario"
+      };
+      
+      // 🔍 Para debugging (puedes comentarlo después)
+      console.log("Datos a enviar:", nuevoUsuario);
+      
+      const respuesta = await registrarUsuario(nuevoUsuario);
+      
+      // ❌ PROBLEMA 1: Verificar que respuesta no sea null
+      if (!respuesta) {
+        return Swal.fire({
+          title: "Error de conexión",
+          text: "No se pudo conectar con el servidor",
+          icon: "error",
+        });
+      }
+
+      // ❌ PROBLEMA 2: Si hay error, NO intentar parsear dos veces
+      if (!respuesta.ok) {
+        const datos = await respuesta.json();
+        return Swal.fire({
+          title: "Ocurrió un error",
+          text: datos?.mensaje || datos?.error || "No se pudo completar el registro.",
+          icon: "error",
+        });
+      }
+
+      // ✅ Solo si todo salió bien
+      const datos = await respuesta.json();
+      
+      // Cerrar modal ANTES del Swal
       registerClose();
+      reset();
+      
+      await Swal.fire({
+        title: "¡Bienvenido!",
+        text: "Te registraste correctamente.",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+
+      // Redirigir después del mensaje
       navigate("/");
+      
+    } catch (error) {
+      console.error("Error en el registro:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error inesperado. Intenta nuevamente.",
+        icon: "error",
+      });
     }
-    reset();
   };
 
   return (
@@ -57,7 +94,7 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
             </span>
           </div>
 
-          <Form className="css-modal-register" onSubmit={handleSubmit(onSubmi)}>
+          <Form className="css-modal-register" onSubmit={handleSubmit(onSubmit)}>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
@@ -188,39 +225,17 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
               </Col>
             </Row>
 
-            <Row className="justify-content-center">
-              <Col md={10}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Tipo de Usuario</Form.Label>
-                  <Form.Select
-                    {...register("tipoUsuario", {
-                      required: "Debes seleccionar un tipo de usuario",
-                    })}
-                  >
-                    <option value="">Selecciona un tipo</option>
-                    <option value="usuario">Usuario</option>
-                    <option value="admin">Administrador</option>
-                  </Form.Select>
-                  {errors.tipoUsuario && (
-                    <span className="text-danger">
-                      {errors.tipoUsuario.message}
-                    </span>
-                  )}
-                </Form.Group>
-              </Col>
-            </Row>
-
             <div className="text-center mt-3 mb-3">
               <span className="text-muted">¿Si ya tienes cuenta? </span>
               <Link
-                onClick={iniciarSesion}
+                onClick={iniciar}
                 className="text-primary text-decoration-none fw-semibold"
               >
-                Inicia sesion
+                Inicia sesión
               </Link>
             </div>
 
-            <div className=" d-flex justify-content-center align-content-center">
+            <div className="d-flex justify-content-center align-content-center">
               <Button variant="primary" type="submit" className="w-50">
                 Registrarse
               </Button>

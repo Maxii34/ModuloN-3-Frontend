@@ -68,7 +68,8 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
         precio: Number(data.precio),
         capacidad: Number(data.capacidad),
         piso: Number(data.piso),
-        metros: Number(data.metros),
+        metrosCuadrados: Number(data.metrosCuadrados),
+        imagenes: data.imagenes,
       };
       
       const id = habitacion._id || habitacion.id;
@@ -88,9 +89,10 @@ const ModalEditarHabitacion = ({ show, onHide, habitacion, onHabitacionEditada }
         onHabitacionEditada();
       }
     } catch (error) {
+      console.error(error);
       Swal.fire({
         title: "Error",
-        text: error.message || "No se pudo actualizar la habitación",
+        text: "No se pudo actualizar. Revisa que el servidor esté corriendo.",
         icon: "error",
         confirmButtonText: "Aceptar",
       });

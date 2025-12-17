@@ -1,35 +1,26 @@
-import { Table, Form } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import UserRow from "./UserRow";
 
 const UserTable = ({ usuarios }) => {
   return (
-    <Table hover responsive className="align-middle border rounded">
-      <thead className="table-light">
+    <Table hover responsive className="align-middle">
+      <thead>
         <tr>
-          <th>
-            <Form.Check />
-          </th>
-          <th>Nombre de Usuario</th>
+          <th>Usuario</th>
           <th>Email</th>
           <th>Rol</th>
-          <th>Estado</th>
-          <th className="text-end">Acciones</th>
+          <th className="text-center">Acciones</th>
         </tr>
       </thead>
 
       <tbody>
-        {usuarios.length > 0 ? (
-          usuarios.map((u) => <UserRow key={u.id} usuario={u} />)
-        ) : (
-          <tr>
-            <td colSpan="6" className="text-center text-muted py-4">
-              No hay usuarios para mostrar
-            </td>
-          </tr>
-        )}
+        {usuarios.map((u) => (
+          <UserRow key={u.id} usuario={u} />
+        ))}
       </tbody>
     </Table>
   );
 };
 
 export default UserTable;
+

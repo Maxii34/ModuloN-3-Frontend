@@ -7,7 +7,12 @@ import { useAuth } from "../../context/AuthContext";
 import { iniciarSesion } from "../../services/usuariosAPI";
 import Swal from "sweetalert2";
 
-export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
+export const ModalLogin = ({
+  showLogin,
+  loginClose,
+  registerShow,
+  setUsuarioLogueado,
+}) => {
   const {
     register,
     handleSubmit,
@@ -19,8 +24,8 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
   const [cargando, setCargando] = useState(false);
 
   const RegistrateAki = () => {
-    registerShow();
     loginClose();
+    registerShow();
   };
 
   const onSubmi = async (data) => {
@@ -73,7 +78,7 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
     <>
       <Modal show={showLogin} onHide={loginClose}>
         <Modal.Body className="">
-          <Form className=" css-modal-login" onSubmit={handleSubmit(onSubmi)}>
+          <Form className="css-modal-login" onSubmit={handleSubmit(onSubmit)}>
             <div className="text-center mb-2">
               <h1 className="mb-2">Bienvenido</h1>
               <div>
@@ -82,6 +87,7 @@ export const ModalLogin = ({ showLogin, loginClose, registerShow }) => {
                 </span>
               </div>
             </div>
+
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
