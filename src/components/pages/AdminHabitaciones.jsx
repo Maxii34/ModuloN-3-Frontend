@@ -54,6 +54,24 @@ const AdminHabitaciones = () => {
         descripcion: data.descripcion,
       };
 
+      // Validación simple de campos numéricos requeridos
+      if (
+        !Number.isFinite(habitacionNueva.numero) ||
+        !Number.isFinite(habitacionNueva.precio) ||
+        !Number.isFinite(habitacionNueva.capacidad) ||
+        !Number.isFinite(habitacionNueva.piso) ||
+        !Number.isFinite(habitacionNueva.metros)
+      ) {
+        Swal.fire("Error", "Completa correctamente los campos numéricos.", "error");
+        return;
+      }
+
+      // Nota: no se aplica un máximo en el frontend; el backend valida según su modelo.
+      if (habitacionNueva.precio < 0) {
+        Swal.fire("Error", "El precio debe ser mayor o igual a 0", "error");
+        return;
+      }
+
       const respuesta = await crearHabitacion(habitacionNueva);
       if (respuesta && respuesta.status === 201) {
         Swal.fire({
@@ -63,12 +81,17 @@ const AdminHabitaciones = () => {
         });
         reset();
         obtenerHabitaciones();
+      } else if (respuesta) {
+        // Mostrar mensaje detallado devuelto por el backend si existe
+        const mensaje = respuesta.datos?.mensaje || respuesta.datos?.msg || "No se pudo guardar la habitación";
+        console.error("Error al crear habitación:", respuesta.datos);
+        Swal.fire("Error", mensaje, "error");
       } else {
         Swal.fire("Error", "No se pudo guardar la habitación", "error");
       }
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", "Fallo de conexión", "error");
+      Swal.fire("Error", error.message || "Fallo de conexión", "error");
     }
   };
 
@@ -164,7 +187,7 @@ const AdminHabitaciones = () => {
                 placeholder="Ej: 5000"
                 {...register("precio", {
                   required: "El precio es obligatorio",
-                  min: { value: 1, message: "El precio debe ser mayor a 0" },
+                  min: { value: 0, message: "El precio debe ser mayor o igual a 0" },
                 })}
               />
               {errors.precio && (

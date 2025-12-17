@@ -45,10 +45,18 @@ export const obtenerHabitacionPorId = async (id) => {
  */
 export const actualizarHabitacion = async (id, habitacionData) => {
   try {
+    // Recuperar token desde sessionStorage (igual que otras consultas que requieren auth)
+    const usuarioRaw = sessionStorage.getItem("usuarioKey");
+    if (!usuarioRaw) {
+      throw new Error("No hay token en la petición");
+    }
+    const token = JSON.parse(usuarioRaw).token;
+
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'x-token': token,
       },
       body: JSON.stringify(habitacionData),
     });

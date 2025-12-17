@@ -38,22 +38,35 @@ export const iniciarSesion = async (usuario) => {
 
 export const crearHabitacion = async (data) => {
   try {
+    // Recuperar token (manejo defensivo)
+    const usuarioRaw = sessionStorage.getItem("usuarioKey");
+    if (!usuarioRaw) {
+      throw new Error("No hay token en la petición");
+    }
+    const token = JSON.parse(usuarioRaw).token;
+
     const respuesta = await fetch(habitacionesBack, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-token": JSON.parse(sessionStorage.getItem("usuarioKey")).token,
+        "x-token": token,
       },
       body: JSON.stringify(data),
     });
+
     const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+      console.error("Error en crearHabitacion (backend):", datos);
+    }
+
     return {
       status: respuesta.status,
       datos: datos,
       ok: respuesta.ok,
-    }
+    };
   } catch (error) {
     console.log(error);
-    return null;
+    throw error;
   }
 }

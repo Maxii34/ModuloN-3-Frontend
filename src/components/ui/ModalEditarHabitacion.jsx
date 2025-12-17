@@ -36,6 +36,13 @@ const ModalEditarHabitacion = ({
     }
   }, [habitacion, show, setValue]);
 
+  // Reset form cuando se cierra el modal para evitar valores stale
+  useEffect(() => {
+    if (!show) {
+      reset();
+    }
+  }, [show, reset]);
+
   const onSubmit = async (data) => {
     try {
       const id = habitacion._id || habitacion.id;
@@ -51,6 +58,13 @@ const ModalEditarHabitacion = ({
       };
 
       // ✅ Usamos la query que ya tiene el puerto y el token correcto
+      // Validación preventiva del precio antes de enviar
+      // Nota: no forzamos un máximo en el frontend; dejamos que el backend valide según su modelo.
+      if (datosFormateados.precio < 0) {
+        Swal.fire("Error", "El precio debe ser mayor o igual a 0", "error");
+        return;
+      }
+
       const respuesta = await actualizarHabitacion(id, datosFormateados);
 
       // Si la query devuelve los datos o un ok
@@ -108,24 +122,30 @@ const ModalEditarHabitacion = ({
             <Form.Label>Precio ($)</Form.Label>
             <Form.Control
               type="number"
-              {...register("precio", { required: true })}
+              {...register("precio", {
+                required: "Precio obligatorio",
+                min: { value: 0, message: "El precio debe ser mayor o igual a 0" },
+              })}
             />
+            <Form.Text className="text-danger">{errors.precio?.message}</Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Capacidad</Form.Label>
             <Form.Control
               type="number"
-              {...register("capacidad", { required: true })}
+              {...register("capacidad", { required: "Capacidad obligatoria" })}
             />
+            <Form.Text className="text-danger">{errors.capacidad?.message}</Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Piso</Form.Label>
             <Form.Control
               type="number"
-              {...register("piso", { required: true })}
+              {...register("piso", { required: "Piso obligatorio" })}
             />
+            <Form.Text className="text-danger">{errors.piso?.message}</Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -187,7 +207,7 @@ const ModalEditarHabitacion = ({
               })}
             />
             <Form.Text className="text-danger">
-              {errors.imagenes?.message}
+              {errors.imagen?.message}
             </Form.Text>
           </Form.Group>
 
