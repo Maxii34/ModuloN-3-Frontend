@@ -6,6 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
 import ModalEditarHabitacion from "../ui/ModalEditarHabitacion";
+import { crearHabitacion } from "../helpers/queries";
 
 const AdminHabitaciones = () => {
   const {
@@ -44,21 +45,16 @@ const AdminHabitaciones = () => {
         tipo: data.tipo,
         precio: parseFloat(data.precio),
         estado: data.estado,
-        imagenes: data.imagenes,
+        imagen: data.imagen,
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
-        metrosCuadrados: parseInt(data.metrosCuadrados),
+        metros: parseInt(data.metrosCuadrados),
         caracteristicas: data.caracteristicas,
         descripcion: data.descripcion,
       };
 
-      const response = await fetch("http://localhost:3000/api/habitaciones", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(habitacionNueva),
-      });
-
-      if (response.ok) {
+      const respuesta = await crearHabitacion(habitacionNueva);
+      if (respuesta && respuesta.status === 201) {
         Swal.fire({
           title: "¡Creada!",
           text: "La habitación se guardó correctamente",
@@ -183,6 +179,7 @@ const AdminHabitaciones = () => {
               <Form.Label>Características</Form.Label>
               <Form.Control
                 type="text"
+                placeholder="Ej: wifi, aire acondicionado, minibar"
                 {...register("caracteristicas", { required: true })}
               />
             </Form.Group>
@@ -213,12 +210,11 @@ const AdminHabitaciones = () => {
               </div>
             </Form.Group>
 
-            {/* CAMBIO 2: Input para 'imagenes' */}
             <Form.Group className="mb-4">
               <Form.Label>Imagen URL</Form.Label>
               <Form.Control
                 type="text"
-                {...register("imagenes", { required: true })}
+                {...register("imagen", { required: true })}
               />
             </Form.Group>
 
