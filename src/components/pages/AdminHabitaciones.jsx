@@ -48,7 +48,7 @@ const AdminHabitaciones = () => {
         imagen: data.imagen,
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
-        metros: parseInt(data.metrosCuadrados),
+        metros: parseInt(data.metrosCuadrados), // ✅ Mantén metros (backend) pero lee metrosCuadrados (formulario)
         caracteristicas: data.caracteristicas,
         descripcion: data.descripcion,
       };
