@@ -1,5 +1,4 @@
-// URL base de la API
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+const API_URL = 'http://localhost:3000/api/habitaciones';
 
 /**
  * Obtiene el token de autenticación desde localStorage
@@ -77,6 +76,35 @@ const realizarPeticion = async (url, opciones = {}) => {
 /**
  * Obtiene todas las habitaciones
  */
+export const actualizarHabitacion = async (id, habitacionData) => {
+  try {
+    // Recuperar token desde sessionStorage (igual que otras consultas que requieren auth)
+    const usuarioRaw = sessionStorage.getItem("usuarioKey");
+    if (!usuarioRaw) {
+      throw new Error("No hay token en la petición");
+    }
+    const token = JSON.parse(usuarioRaw).token;
+
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-token': token,
+      },
+      body: JSON.stringify(habitacionData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.mensaje || 'Error al actualizar la habitación');
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error en actualizarHabitacion:', error);
+    throw error;
+  }
 export const obtenerHabitaciones = async () => {
   return realizarPeticion("/habitaciones", {
     method: "GET",
@@ -105,18 +133,22 @@ export const crearHabitacion = async (datosHabitacion) => {
 /**
  * Edita una habitación existente
  */
-export const editarHabitacion = async (id, datosHabitacion) => {
-  return realizarPeticion(`/habitaciones/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(datosHabitacion),
-  });
-};
-
-/**
- * Actualiza una habitación existente (alias de editarHabitacion)
- */
-export const actualizarHabitacion = async (id, datosHabitacion) => {
-  return editarHabitacion(id, datosHabitacion);
+export const eliminarHabitacion = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        "x-token": JSON.parse(sessionStorage.getItem("usuarioKey")).token,
+      },
+    });
+    
+    // Retornamos el objeto response para poder validar el status en el componente
+    return response; 
+  } catch (error) {
+    console.error('Error en eliminarHabitacion:', error);
+    return null;
+  }
 };
 
 /**
