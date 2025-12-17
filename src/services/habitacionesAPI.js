@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api/habitaciones';
+const API_URL = 'http://localhost:3000/api/habitaciones';
 
 /**
  * Obtiene todas las habitaciones del backend
@@ -105,19 +105,15 @@ export const eliminarHabitacion = async (id) => {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        "x-token": JSON.parse(sessionStorage.getItem("usuarioKey")).token,
       },
     });
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.mensaje || 'Error al eliminar la habitación');
-    }
-    
-    const data = await response.json();
-    return data;
+    // Retornamos el objeto response para poder validar el status en el componente
+    return response; 
   } catch (error) {
     console.error('Error en eliminarHabitacion:', error);
-    throw error;
+    return null;
   }
 };
 

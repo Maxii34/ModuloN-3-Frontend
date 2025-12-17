@@ -7,6 +7,7 @@ import "../../index.css";
 import CardsHabitaciones from "../pages/habitaciones/CardsHabitaciones";
 import ModalEditarHabitacion from "../ui/ModalEditarHabitacion";
 import { crearHabitacion } from "../helpers/queries";
+import { eliminarHabitacion } from "../../services/habitacionesAPI";
 
 const AdminHabitaciones = () => {
   const {
@@ -48,7 +49,7 @@ const AdminHabitaciones = () => {
         imagen: data.imagen,
         capacidad: parseInt(data.capacidad),
         piso: parseInt(data.piso),
-        metros: parseInt(data.metrosCuadrados), // ✅ Mantén metros (backend) pero lee metrosCuadrados (formulario)
+        metros: parseInt(data.metrosCuadrados), 
         caracteristicas: data.caracteristicas,
         descripcion: data.descripcion,
       };
@@ -73,37 +74,35 @@ const AdminHabitaciones = () => {
 
   // BORRAR (DELETE)
   const borrarHabitacion = (id) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch(
-            `http://localhost:3000/api/habitaciones/${id}`,
-            { method: "DELETE" }
-          );
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡No podrás revertir esto!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Sí, eliminar",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // USAMOS LA FUNCIÓN DE QUERIES
+      const respuesta = await eliminarHabitacion(id);
 
-          if (response.ok) {
-            setHabitaciones(
-              habitaciones.filter((hab) => (hab._id || hab.id) !== id)
-            );
-            Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
-          } else {
-            Swal.fire("Error", "No se pudo eliminar.", "error");
-          }
-        } catch (error) {
-          console.error(error);
-          Swal.fire("Error", "Fallo de conexión.", "error");
-        }
+      if (respuesta && (respuesta.status === 200 || respuesta.ok)) {
+        // Actualizamos el estado local
+        setHabitaciones(
+          habitaciones.filter((hab) => (hab._id || hab.id) !== id)
+        );
+        Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
+      } else {
+        Swal.fire(
+          "Error", 
+          "No se pudo eliminar. Verifique si tiene permisos de administrador.", 
+          "error"
+        );
       }
-    });
-  };
+    }
+  });
+};
 
   // LÓGICA DEL MODAL
   const handleEditarHabitacion = (habitacion) => {
