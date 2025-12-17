@@ -7,12 +7,21 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext";
 
 function ReservaHabitacion() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [habitacion, setHabitacion] = useState(null);
   const [cargando, setCargando] = useState(true);
+
+  // Obtener usuario para autocompletar
+  const { user } = useAuth();
+  const usuarioStorage =
+    JSON.parse(sessionStorage.getItem("usuarioKey"))?.usuario || {};
+  const usuarioActual = user || usuarioStorage;
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -25,13 +34,93 @@ function ReservaHabitacion() {
           setHabitacion(dato);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error al cargar habitación:", error);
       } finally {
         setCargando(false);
       }
     };
     cargarDatos();
   }, [id]);
+
+  const handleConfirmarPago = async (e) => {
+    e.preventDefault();
+
+    // 1. OBTENER EL TOKEN DEL STORAGE
+    // (Necesitamos esto para que el Backend no nos dé error 401)
+    const datosMemoria = JSON.parse(sessionStorage.getItem("usuarioKey"));
+    const token = datosMemoria?.token;
+
+    if (!token) {
+      Swal.fire(
+        "Error",
+        "No tienes permiso. Por favor inicia sesión nuevamente.",
+        "error"
+      );
+      return;
+    }
+
+    Swal.fire({
+      title: "Confirmar Reserva",
+      text: `¿Estás seguro de reservar la habitación ${habitacion?.numero}?`,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#0d6efd",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Sí, pagar ahora",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const habitacionActualizada = {
+            ...habitacion,
+            estado: "reservada",
+          };
+
+          const respuesta = await fetch(
+            `http://localhost:3000/api/habitaciones/${id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                // 2. ENVIAR EL TOKEN EN EL HEADER
+                "x-token": token,
+              },
+              body: JSON.stringify(habitacionActualizada),
+            }
+          );
+
+          if (respuesta.ok) {
+            Swal.fire({
+              title: "¡Pago Exitoso!",
+              text: "La habitación ha sido reservada correctamente.",
+              icon: "success",
+              confirmButtonText: "Volver al inicio",
+            }).then(() => {
+              navigate("/");
+            });
+          } else {
+            // Si sigue dando error, vemos qué status es
+            if (respuesta.status === 401) {
+              Swal.fire(
+                "Error",
+                "Tu sesión ha expirado o no tienes permisos.",
+                "error"
+              );
+            } else {
+              Swal.fire("Error", "No se pudo procesar la reserva.", "error");
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          Swal.fire(
+            "Error",
+            "Fallo de conexión al intentar reservar.",
+            "error"
+          );
+        }
+      }
+    });
+  };
 
   if (cargando) {
     return (
@@ -50,8 +139,7 @@ function ReservaHabitacion() {
     );
   }
 
-  // (2% Impuesto)
-  const precioBase = habitacion.precio;
+  const precioBase = habitacion.precio || 0;
   const impuestos = precioBase * 0.02;
   const total = precioBase + impuestos;
 
@@ -70,7 +158,13 @@ function ReservaHabitacion() {
             <Form.Label className="fw-normal text-muted">
               Nombre Completo
             </Form.Label>
-            <Form.Control type="text" placeholder="Tu Nombre" className="p-2" />
+            <Form.Control
+              type="text"
+              placeholder="Tu Nombre"
+              className="p-2"
+              defaultValue={usuarioActual.nombre}
+              readOnly
+            />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label className="fw-normal text-muted">
@@ -80,6 +174,8 @@ function ReservaHabitacion() {
               type="email"
               placeholder="ejemplo@correo.com"
               className="p-2"
+              defaultValue={usuarioActual.email}
+              readOnly
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -121,6 +217,7 @@ function ReservaHabitacion() {
 
       <hr className="my-5" />
 
+      {/* === SECCIÓN 2: Resumen === */}
       <div className="p-4 rounded bg-white border shadow-sm">
         <div className="mb-4 border-bottom pb-3">
           <div
@@ -168,7 +265,12 @@ function ReservaHabitacion() {
             </span>
           </div>
 
-          <Button variant="primary" size="lg" className="w-100 fw-bold">
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-100 fw-bold"
+            onClick={handleConfirmarPago}
+          >
             CONFIRMAR PAGO
           </Button>
         </div>
