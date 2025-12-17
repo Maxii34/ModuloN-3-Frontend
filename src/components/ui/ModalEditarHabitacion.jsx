@@ -2,6 +2,7 @@ import { Modal, Form, Button } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
+import { actualizarHabitacion } from "../../services/habitacionesAPI";
 
 const ModalEditarHabitacion = ({
   show,
@@ -28,8 +29,10 @@ const ModalEditarHabitacion = ({
       setValue("caracteristicas", habitacion.caracteristicas || "");
       setValue("descripcion", habitacion.descripcion || "");
       setValue("estado", habitacion.estado);
-      setValue("metrosCuadrados", habitacion.metrosCuadrados);
-      setValue("imagenes", habitacion.imagenes || habitacion.imagen || "");
+      // ✅ IMPORTANTE: Si en la DB se guarda como 'metros', cámbialo aquí:
+      setValue("metrosCuadrados", habitacion.metros || habitacion.metrosCuadrados);
+      // ✅ Consistencia con el nombre del campo de imagen
+      setValue("imagen", habitacion.imagen || habitacion.imagenes || "");
     }
   }, [habitacion, show, setValue]);
 
@@ -39,51 +42,37 @@ const ModalEditarHabitacion = ({
 
       const datosFormateados = {
         ...data,
-        tipo: data.tipo?.toLowerCase(),
-        estado: data.estado?.toLowerCase(),
         numero: Number(data.numero),
         precio: Number(data.precio),
         capacidad: Number(data.capacidad),
         piso: Number(data.piso),
-        metrosCuadrados: Number(data.metrosCuadrados),
-        imagenes: data.imagenes,
+        metros: Number(data.metrosCuadrados), // ✅ Enviamos 'metros' al backend
+        imagen: data.imagen // ✅ Consistencia de nombre
       };
 
-      const respuesta = await fetch(
-        `http://localhost:3000/api/habitaciones/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(datosFormateados),
-        }
-      );
+      // ✅ Usamos la query que ya tiene el puerto y el token correcto
+      const respuesta = await actualizarHabitacion(id, datosFormateados);
 
-      if (!respuesta.ok) {
-        throw new Error("Error al actualizar en el servidor");
-      }
+      // Si la query devuelve los datos o un ok
+      if (respuesta) {
+        Swal.fire({
+          title: "¡Editada!",
+          text: "La habitación ha sido actualizada correctamente.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
 
-      Swal.fire({
-        title: "¡Editada!",
-        text: "La habitación ha sido actualizada correctamente.",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-
-      onHide();
-
-      if (onHabitacionEditada) {
-        onHabitacionEditada();
+        onHabitacionEditada(); // Refresca la lista
+        onHide(); // Cierra el modal
+        reset(); // Limpia el formulario
       }
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "No se pudo actualizar. Revisa que el servidor esté corriendo.",
+        text: "No se pudo actualizar. Revisa la conexión o tus permisos.",
         icon: "error",
-        confirmButtonText: "Aceptar",
       });
     }
   };
@@ -193,7 +182,7 @@ const ModalEditarHabitacion = ({
             <Form.Control
               type="text"
               placeholder="Ej: https://example.com/habitacion.jpg"
-              {...register("imagenes", {
+              {...register("imagen", {
                 required: "Debe proporcionar una imagen",
               })}
             />
