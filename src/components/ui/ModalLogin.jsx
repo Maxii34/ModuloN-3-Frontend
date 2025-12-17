@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
-import { iniciarSesion } from "../helpers/queries";
+import { useAuth } from "../../context/AuthContext";
+import { iniciarSesion } from "../../services/usuariosAPI";
 import Swal from "sweetalert2";
-import { useAuth } from "../../context/AuthContext"; // Importa useAuth
 
 export const ModalLogin = ({
   showLogin,
@@ -18,71 +19,58 @@ export const ModalLogin = ({
     reset,
     formState: { errors },
   } = useForm();
-
-  const navegacion = useNavigate();
-  const { loginAdmin, loginUser } = useAuth(); // Obtén las funciones del contexto
+  const { loginAdmin, loginUser } = useAuth();
+  const navigate = useNavigate();
+  const [cargando, setCargando] = useState(false);
 
   const RegistrateAki = () => {
     loginClose();
     registerShow();
   };
 
-  const onSubmit = async (data) => {
+  const onSubmi = async (data) => {
     try {
-      const respuesta = await iniciarSesion(data);
+      setCargando(true);
+      const respuesta = await iniciarSesion(data.email, data.password);
+      
+      // Guardar token y datos del usuario
+      const datosUsuario = {
+        email: respuesta.usuario.email,
+        tipo: respuesta.usuario.tipo,
+        nombre: respuesta.usuario.nombre,
+        apellido: respuesta.usuario.apellido,
+        id: respuesta.usuario.id,
+        token: respuesta.token,
+      };
 
-      if (respuesta && respuesta.status === 200) {
-        const datos = await respuesta.json();
-
-        const usuarioData = {
-          usuario: datos.usuario,
-          token: datos.token,
-          tipo: datos.usuario.tipo,
-        };
-
-        // Actualiza el estado local
-        setUsuarioLogueado(usuarioData);
-        sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
-
-        // Actualiza el AuthContext según el tipo de usuario
-        if (datos.usuario.tipo === "admin") {
-          loginAdmin(usuarioData); // Actualiza el contexto para admin
-        } else if (datos.usuario.tipo === "usuario") {
-          loginUser(usuarioData); // Actualiza el contexto para usuario
-        }
-
+      if (respuesta.usuario.tipo === "admin") {
+        loginAdmin(datosUsuario);
         loginClose();
-        reset();
-
-        await Swal.fire({
-          title: "¡Bienvenido!",
-          text: "Has iniciado sesión correctamente.",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-          timerProgressBar: true,
-        });
-
-        // Redirige según el tipo
-        if (datos.usuario.tipo === "admin") {
-          navegacion("/admin-dashboard");
-        } else {
-          navegacion("/");
-        }
+        navigate("/admin-dashboard");
       } else {
-        Swal.fire({
-          title: "Ocurrió un error",
-          text: "Credenciales incorrectas",
-          icon: "error",
-        });
+        loginUser(datosUsuario);
+        loginClose();
+        navigate("/");
       }
+
+      Swal.fire({
+        title: "¡Bienvenido!",
+        text: respuesta.mensaje || "Inicio de sesión exitoso",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      reset();
     } catch (error) {
-      console.error("Error al iniciar sesión:", error);
       Swal.fire({
         title: "Error",
-        text: "Hubo un problema al conectar con el servidor",
+        text: error.message || "No se pudo iniciar sesión",
         icon: "error",
+        confirmButtonText: "Aceptar",
       });
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -147,8 +135,19 @@ export const ModalLogin = ({
               </Link>
             </div>
 
-            <Button variant="primary" type="submit" className="w-100">
-              Iniciar Sesión
+            <Button variant="primary" type="submit" className="w-100" disabled={cargando}>
+              {cargando ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Iniciando sesión...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </Button>
           </Form>
         </Modal.Body>
