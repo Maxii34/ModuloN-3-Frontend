@@ -1,4 +1,6 @@
 const usuariosBack = import.meta.env.VITE_API_USUARIOS;
+const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
+
 
 export const registrarUsuario = async (nuevoUsuario) => {
   try {
@@ -31,3 +33,27 @@ export const iniciarSesion = async (usuario) => {
     return null;
   }
 };
+
+//crud de habitaciones-
+
+export const crearHabitacion = async (data) => {
+  try {
+    const respuesta = await fetch(habitacionesBack, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-token": JSON.parse(sessionStorage.getItem("usuarioKey")).token,
+      },
+      body: JSON.stringify(data),
+    });
+    const datos = await respuesta.json();
+    return {
+      status: respuesta.status,
+      datos: datos,
+      ok: respuesta.ok,
+    }
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
