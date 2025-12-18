@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { iniciarSesion } from "../helpers/queries";
 import Swal from "sweetalert2";
-import { useAuth } from "../../context/AuthContext"; // Importa useAuth
+import { useAuth } from "../../context/AuthContext"; 
 
 export const ModalLogin = ({
   showLogin,
@@ -20,7 +20,7 @@ export const ModalLogin = ({
   } = useForm();
 
   const navegacion = useNavigate();
-  const { loginAdmin, loginUser } = useAuth(); // Obtén las funciones del contexto
+  const { loginAdmin, loginUser } = useAuth();
 
   const RegistrateAki = () => {
     loginClose();
@@ -46,9 +46,9 @@ export const ModalLogin = ({
 
         // Actualiza el AuthContext según el tipo de usuario
         if (datos.usuario.tipo === "admin") {
-          loginAdmin(usuarioData); // Actualiza el contexto para admin
+          loginAdmin(usuarioData); 
         } else if (datos.usuario.tipo === "usuario") {
-          loginUser(usuarioData); // Actualiza el contexto para usuario
+          loginUser(usuarioData); 
         }
 
         loginClose();
