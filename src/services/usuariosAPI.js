@@ -79,3 +79,19 @@ export const obtenerUsuarioPorId = async (id, token) => {
     },
   });
 };
+
+export const asignarHabitacionUsuario = async (
+  idUsuario,
+  idHabitacion,
+  token
+) => {
+  return realizarPeticion(`/usuarios/${idUsuario}`, {
+    method: "PUT",
+    headers: {
+      "x-token": token,
+    },
+    body: JSON.stringify({
+      habitacionAsignada: idHabitacion,
+    }),
+  });
+};
