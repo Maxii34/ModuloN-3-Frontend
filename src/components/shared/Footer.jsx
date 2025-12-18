@@ -37,9 +37,6 @@ function Footer() {
               <Link to="/nosotros" className="footer-link" onClick={() => handleNavClick('/nosotros')}>
                 Quiénes somos
               </Link>
-              <Link to="/galeria" className="footer-link" onClick={() => handleNavClick('/galeria')}>
-                Galería
-              </Link>
               <Link to="/habitaciones" className="footer-link" onClick={() => handleNavClick('/habitaciones')}>
                 Habitaciones
               </Link>
