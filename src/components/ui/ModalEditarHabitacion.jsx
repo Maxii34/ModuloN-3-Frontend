@@ -29,9 +29,7 @@ const ModalEditarHabitacion = ({
       setValue("caracteristicas", habitacion.caracteristicas || "");
       setValue("descripcion", habitacion.descripcion || "");
       setValue("estado", habitacion.estado);
-      // ✅ IMPORTANTE: Si en la DB se guarda como 'metros', cámbialo aquí:
       setValue("metrosCuadrados", habitacion.metros || habitacion.metrosCuadrados);
-      // ✅ Consistencia con el nombre del campo de imagen
       setValue("imagen", habitacion.imagen || habitacion.imagenes || "");
     }
   }, [habitacion, show, setValue]);
@@ -53,13 +51,10 @@ const ModalEditarHabitacion = ({
         precio: Number(data.precio),
         capacidad: Number(data.capacidad),
         piso: Number(data.piso),
-        metros: Number(data.metrosCuadrados), // ✅ Enviamos 'metros' al backend
-        imagen: data.imagen // ✅ Consistencia de nombre
+        metros: Number(data.metrosCuadrados), 
+        imagen: data.imagen 
       };
 
-      // ✅ Usamos la query que ya tiene el puerto y el token correcto
-      // Validación preventiva del precio antes de enviar
-      // Nota: no forzamos un máximo en el frontend; dejamos que el backend valide según su modelo.
       if (datosFormateados.precio < 0) {
         Swal.fire("Error", "El precio debe ser mayor o igual a 0", "error");
         return;
@@ -67,7 +62,6 @@ const ModalEditarHabitacion = ({
 
       const respuesta = await actualizarHabitacion(id, datosFormateados);
 
-      // Si la query devuelve los datos o un ok
       if (respuesta) {
         Swal.fire({
           title: "¡Editada!",
@@ -212,10 +206,10 @@ const ModalEditarHabitacion = ({
           </Form.Group>
 
           <div className="d-flex gap-2 justify-content-end">
-            <Button variant="secondary" onClick={onHide}>
+            <Button variant="danger" onClick={onHide}>
               Cancelar
             </Button>
-            <Button variant="primary" type="submit">
+            <Button variant="dark" type="submit">
               Guardar Cambios
             </Button>
           </div>
