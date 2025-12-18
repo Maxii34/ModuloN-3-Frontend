@@ -1,28 +1,63 @@
 import { useState } from "react";
 import { Button, Modal, Badge, Card } from "react-bootstrap";
+import Swal from "sweetalert2";
+import { eliminarUsuario } from "../../../services/usuariosAPI";
 
-const UserRow = ({ usuario }) => {
+const UserRow = ({ usuario, onUsuarioEliminado }) => {
   const [showModal, setShowModal] = useState(false);
+
+  const handleEliminar = async () => {
+    const confirmacion = await Swal.fire({
+      title: "¿Eliminar usuario?",
+      text: `Se eliminará a ${usuario.nombre} ${usuario.apellido}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirmacion.isConfirmed) return;
+
+    try {
+      const usuarioKey = JSON.parse(
+        sessionStorage.getItem("usuarioKey")
+      );
+
+      await eliminarUsuario(usuario._id, usuarioKey.token);
+
+      Swal.fire({
+        icon: "success",
+        title: "Usuario eliminado",
+        text: "El usuario fue eliminado correctamente",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      onUsuarioEliminado(usuario._id);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo eliminar el usuario",
+      });
+    }
+  };
 
   return (
     <>
-      {/* FILA */}
       <tr>
         <td className="d-flex align-items-center gap-2">
           <div
-          className={`rounded-circle d-flex align-items-center justify-content-center
-            bg-${usuario.tipo === "admin" ? "primary" : "secondary"}
-            text-white`}
-          style={{ width: 40, height: 40 }}
-        >
-          <i className="bi bi-person-fill"></i>
-        </div>
-
-          <div>
-            <div className="fw-semibold">
-              {usuario.nombre} {usuario.apellido}
-            </div>
+            className={`rounded-circle d-flex align-items-center justify-content-center
+            bg-${usuario.tipo === "admin" ? "primary" : "secondary"} text-white`}
+            style={{ width: 40, height: 40 }}
+          >
+            <i className="bi bi-person-fill"></i>
           </div>
+          <span className="fw-semibold">
+            {usuario.nombre} {usuario.apellido}
+          </span>
         </td>
 
         <td>{usuario.email}</td>
@@ -46,9 +81,16 @@ const UserRow = ({ usuario }) => {
           <Button
             variant="outline-danger"
             size="sm"
+            disabled={usuario.tipo === "admin"}
+            onClick={handleEliminar}
+            title={
+              usuario.tipo === "admin"
+                ? "No se puede eliminar un administrador"
+                : "Eliminar usuario"
+            }
           >
             <i className="bi bi-trash"></i>
-          </Button>
+        </Button>
         </td>
       </tr>
 
@@ -66,17 +108,16 @@ const UserRow = ({ usuario }) => {
         </Modal.Header>
 
         <Modal.Body>
-          {/* INFO USUARIO */}
+          {/* INFO PRINCIPAL */}
           <div className="d-flex gap-4 align-items-start mb-4">
             <div
               className={`rounded-circle d-flex align-items-center justify-content-center
                 bg-${usuario.tipo === "admin" ? "primary" : "secondary"}
                 text-white`}
-              style={{ width: 40, height: 40 }}
+              style={{ width: 60, height: 60 }}
             >
-              <i className="bi bi-person-fill"></i>
+              <i className="bi bi-person-fill fs-3"></i>
             </div>
-
 
             <div className="flex-grow-1">
               <h5 className="fw-bold mb-1">
@@ -85,16 +126,13 @@ const UserRow = ({ usuario }) => {
 
               <p className="text-muted mb-2">{usuario.email}</p>
 
-              <Badge
-                bg={usuario.tipo === "admin" ? "primary" : "secondary"}
-              >
+              <Badge bg={usuario.tipo === "admin" ? "primary" : "secondary"}>
                 {usuario.tipo}
               </Badge>
 
               <div className="row small mt-3">
                 <div className="col-md-6 mb-2">
-                  <strong>Teléfono:</strong>{" "}
-                  {usuario.telefono || "—"}
+                  <strong>ID:</strong> {usuario._id}
                 </div>
                 <div className="col-md-6 mb-2">
                   <strong>Registrado:</strong>{" "}
@@ -110,9 +148,7 @@ const UserRow = ({ usuario }) => {
           {usuario.tipo === "usuario" && (
             <>
               <hr />
-              <h6 className="fw-bold mb-3">
-                Habitación Reservada
-              </h6>
+              <h6 className="fw-bold mb-3">Habitación Reservada</h6>
 
               <Card className="shadow-sm">
                 <Card.Body>
@@ -132,10 +168,7 @@ const UserRow = ({ usuario }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowModal(false)}
-          >
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cerrar
           </Button>
         </Modal.Footer>
