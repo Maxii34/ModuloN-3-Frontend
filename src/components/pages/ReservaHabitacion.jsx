@@ -7,6 +7,7 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
+import { asignarHabitacionUsuario } from "../../services/usuariosAPI";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
@@ -42,90 +43,38 @@ function ReservaHabitacion() {
     cargarDatos();
   }, [id]);
 
-  const handleConfirmarPago = async (e) => {
-    e.preventDefault();
+  const handleConfirmar = async () => {
+    try {
+      const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
 
-    // 1. OBTENER EL TOKEN DEL STORAGE
-    // (Necesitamos esto para que el Backend no nos dé error 401)
-    const datosMemoria = JSON.parse(sessionStorage.getItem("usuarioKey"));
-    const token = datosMemoria?.token;
-
-    if (!token) {
-      Swal.fire(
-        "Error",
-        "No tienes permiso. Por favor inicia sesión nuevamente.",
-        "error"
-      );
-      return;
-    }
-
-    Swal.fire({
-      title: "Confirmar Reserva",
-      text: `¿Estás seguro de reservar la habitación ${habitacion?.numero}?`,
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonColor: "#0d6efd",
-      cancelButtonColor: "#6c757d",
-      confirmButtonText: "Sí, pagar ahora",
-      cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const habitacionActualizada = {
-            ...habitacion,
-            estado: "reservada",
-          };
-
-          const respuesta = await fetch(
-            `http://localhost:3000/api/habitaciones/${id}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                // 2. ENVIAR EL TOKEN EN EL HEADER
-                "x-token": token,
-              },
-              body: JSON.stringify(habitacionActualizada),
-            }
-          );
-
-          if (respuesta.ok) {
-            Swal.fire({
-              title: "¡Pago Exitoso!",
-              text: "La habitación ha sido reservada correctamente.",
-              icon: "success",
-              confirmButtonText: "Volver al inicio",
-            }).then(() => {
-              navigate("/");
-            });
-          } else {
-            // Si sigue dando error, vemos qué status es
-            if (respuesta.status === 401) {
-              Swal.fire(
-                "Error",
-                "Tu sesión ha expirado o no tienes permisos.",
-                "error"
-              );
-            } else {
-              Swal.fire("Error", "No se pudo procesar la reserva.", "error");
-            }
-          }
-        } catch (error) {
-          console.error(error);
-          Swal.fire(
-            "Error",
-            "Fallo de conexión al intentar reservar.",
-            "error"
-          );
-        }
+      if (!session) {
+        throw new Error("Debes iniciar sesión");
       }
-    });
+
+      await asignarHabitacionUsuario(
+        session.usuario.id,
+        habitacion._id,
+        session.token
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Reserva confirmada",
+        text: "La habitación fue asignada correctamente",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+      });
+    }
   };
 
   if (cargando) {
     return (
       <Container className="py-5 text-center">
-        <Spinner animation="border" variant="primary" />
+        <Spinner animation="border" />
         <p>Cargando datos de la reserva...</p>
       </Container>
     );
@@ -188,33 +137,15 @@ function ReservaHabitacion() {
           </Form.Group>
         </Form>
 
-        <h3 className="mb-4 border-bottom pb-2 mt-5">2. Información de Pago</h3>
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-normal text-muted">
-              Número de Tarjeta
-            </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="XXXX XXXX XXXX XXXX"
-              className="p-2"
-            />
-          </Form.Group>
-          <div className="d-flex justify-content-between gap-3">
-            <Form.Group className="flex-grow-1">
-              <Form.Label className="fw-normal text-muted">
-                Vencimiento
-              </Form.Label>
-              <Form.Control type="text" placeholder="MM/AA" className="p-2" />
-            </Form.Group>
-            <Form.Group className="flex-grow-1">
-              <Form.Label className="fw-normal text-muted">CVC</Form.Label>
-              <Form.Control type="text" placeholder="123" className="p-2" />
-            </Form.Group>
-          </div>
-        </Form>
-      </div>
+      <div className="p-4 rounded border shadow-sm">
+        <h5 className="fw-bold">
+          {habitacion.tipo} – Habitación {habitacion.numero}
+        </h5>
 
+        <ListGroup className="my-3">
+          <ListGroup.Item className="d-flex justify-content-between">
+            <span>Alojamiento</span>
+            <span>${precioBase}</span>
       <hr className="my-5" />
 
       {/* === SECCIÓN 2: Resumen === */}
@@ -251,8 +182,8 @@ function ReservaHabitacion() {
             <span className="text-secondary">Alojamiento (1 Noche)</span>
             <span>${precioBase.toLocaleString()}</span>
           </ListGroup.Item>
-          <ListGroup.Item className="d-flex justify-content-between bg-white border-0 py-2">
-            <span className="text-secondary">Impuestos y Tasas (2%)</span>
+          <ListGroup.Item className="d-flex justify-content-between">
+            <span>Impuestos (2%)</span>
             <span>${impuestos.toFixed(2)}</span>
           </ListGroup.Item>
         </ListGroup>
@@ -274,6 +205,10 @@ function ReservaHabitacion() {
             CONFIRMAR PAGO
           </Button>
         </div>
+
+        <Button className="w-100 fw-bold" onClick={handleConfirmar}>
+          CONFIRMAR PAGO
+        </Button>
       </div>
     </Container>
   );

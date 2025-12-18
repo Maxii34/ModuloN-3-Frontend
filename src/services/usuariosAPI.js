@@ -49,3 +49,49 @@ export const crearUsuario = async (datosUsuario) => {
     body: JSON.stringify(datosUsuario),
   });
 };
+
+
+export const listarUsuarios = async (token) => {
+  return realizarPeticion("/usuarios", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// ELIMINAR USUARIO
+export const eliminarUsuario = async (id, token) => {
+  return realizarPeticion(`/usuarios/${id}`, {
+    method: "DELETE",
+    headers: {
+      "x-token": token,
+    },
+  });
+};
+
+// OBTENER USUARIO POR ID (opcional)
+export const obtenerUsuarioPorId = async (id, token) => {
+  return realizarPeticion(`/usuarios/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const asignarHabitacionUsuario = async (
+  idUsuario,
+  idHabitacion,
+  token
+) => {
+  return realizarPeticion(`/usuarios/${idUsuario}`, {
+    method: "PUT",
+    headers: {
+      "x-token": token,
+    },
+    body: JSON.stringify({
+      habitacionAsignada: idHabitacion,
+    }),
+  });
+};

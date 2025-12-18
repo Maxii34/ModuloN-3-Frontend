@@ -1,6 +1,6 @@
 const API_URL = 'http://localhost:3000/api/habitaciones';
 
-/**
+/*
 
 Obtiene todas las habitaciones del backend
 @returns {Promise} Lista de habitaciones
