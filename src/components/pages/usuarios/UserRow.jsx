@@ -51,7 +51,7 @@ const UserRow = ({ usuario, onUsuarioEliminado }) => {
     if (usuario.habitacionAsignada) {
       try {
         const resp = await fetch(
-          `http://localhost:3000/api/habitaciones/${usuario.habitacionAsignada}`
+          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${usuario.habitacionAsignada}`
         );
         const data = await resp.json();
         setHabitacion(data);
