@@ -55,7 +55,7 @@ export const ModalLogin = ({
         reset();
 
         await Swal.fire({
-          title: "¡Bienvenido!",
+          title: `¡Bienvenido, ${datos.usuario.nombre}!`,
           text: "Has iniciado sesión correctamente.",
           icon: "success",
           timer: 2000,
