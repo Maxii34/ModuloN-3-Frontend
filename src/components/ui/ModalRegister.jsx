@@ -62,7 +62,7 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
         timerProgressBar: true,
       });
 
-      // Redirigir después del mensaje
+      
       navigate("/");
       
     } catch (error) {

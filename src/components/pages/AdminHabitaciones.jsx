@@ -66,7 +66,6 @@ const AdminHabitaciones = () => {
         return;
       }
 
-      // Nota: no se aplica un máximo en el frontend; el backend valida según su modelo.
       if (habitacionNueva.precio < 0) {
         Swal.fire("Error", "El precio debe ser mayor o igual a 0", "error");
         return;
@@ -82,7 +81,6 @@ const AdminHabitaciones = () => {
         reset();
         obtenerHabitaciones();
       } else if (respuesta) {
-        // Mostrar mensaje detallado devuelto por el backend si existe
         const mensaje = respuesta.datos?.mensaje || respuesta.datos?.msg || "No se pudo guardar la habitación";
         console.error("Error al crear habitación:", respuesta.datos);
         Swal.fire("Error", mensaje, "error");
@@ -107,7 +105,6 @@ const AdminHabitaciones = () => {
     confirmButtonText: "Sí, eliminar",
   }).then(async (result) => {
     if (result.isConfirmed) {
-      // USAMOS LA FUNCIÓN DE QUERIES
       const respuesta = await eliminarHabitacion(id);
 
       if (respuesta && (respuesta.status === 200 || respuesta.ok)) {
