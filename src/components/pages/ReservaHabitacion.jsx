@@ -142,10 +142,7 @@ function ReservaHabitacion() {
           {habitacion.tipo} – Habitación {habitacion.numero}
         </h5>
 
-        <ListGroup className="my-3">
-          <ListGroup.Item className="d-flex justify-content-between">
-            <span>Alojamiento</span>
-            <span>${precioBase}</span>
+        
       <hr className="my-5" />
 
       {/* === SECCIÓN 2: Resumen === */}
@@ -200,15 +197,13 @@ function ReservaHabitacion() {
             variant="dark"
             size="lg"
             className="w-100 fw-bold"
-            onClick={handleConfirmarPago}
+            onClick={handleConfirmar}
           >
             CONFIRMAR PAGO
           </Button>
         </div>
-
-        <Button className="w-100 fw-bold" onClick={handleConfirmar}>
-          CONFIRMAR PAGO
-        </Button>
+      </div>
+      </div>
       </div>
     </Container>
   );
