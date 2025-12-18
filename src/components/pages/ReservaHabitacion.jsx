@@ -47,26 +47,65 @@ function ReservaHabitacion() {
     try {
       const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
 
-      if (!session) {
-        throw new Error("Debes iniciar sesión");
+      if (!session || !session.token) {
+        throw new Error("Debes iniciar sesión para reservar");
       }
 
-      await asignarHabitacionUsuario(
-        session.usuario.id,
-        habitacion._id,
-        session.token
-      );
-
-      Swal.fire({
-        icon: "success",
-        title: "Reserva confirmada",
-        text: "La habitación fue asignada correctamente",
+      // Pregunta de confirmación
+      const result = await Swal.fire({
+        title: "Confirmar Reserva",
+        text: `¿Estás seguro de reservar la habitación ${habitacion?.numero}?`,
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#0d6efd",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, pagar ahora",
+        cancelButtonText: "Cancelar",
       });
+
+      if (result.isConfirmed) {
+        // PASO 1: Asignar habitación al usuario (Lógica de tu compañero)
+        await asignarHabitacionUsuario(
+          session.usuario.id,
+          habitacion._id || habitacion.id,
+          session.token
+        );
+
+        // PASO 2: Cambiar el estado de la habitación a "reservada" (Tu lógica)
+        const habitacionActualizada = { ...habitacion, estado: "reservada" };
+        
+        const respuestaEstado = await fetch(
+          `http://localhost:3000/api/habitaciones/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "x-token": session.token, // Enviamos el token por seguridad
+            },
+            body: JSON.stringify(habitacionActualizada),
+          }
+        );
+
+        if (!respuestaEstado.ok) {
+           throw new Error("Se asignó el usuario, pero falló al actualizar el estado de la habitación.");
+        }
+
+        // Si todo salió bien:
+        Swal.fire({
+          icon: "success",
+          title: "Reserva confirmada",
+          text: "La habitación fue asignada y marcada como reservada correctamente.",
+        }).then(() => {
+           navigate("/");
+        });
+      }
+
     } catch (error) {
+      console.error(error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.message,
+        text: error.message || "Ocurrió un error al procesar la reserva",
       });
     }
   };
@@ -136,16 +175,14 @@ function ReservaHabitacion() {
             />
           </Form.Group>
         </Form>
+      </div>
 
       <div className="p-4 rounded border shadow-sm">
         <h5 className="fw-bold">
           {habitacion.tipo} – Habitación {habitacion.numero}
         </h5>
+      </div>
 
-        <ListGroup className="my-3">
-          <ListGroup.Item className="d-flex justify-content-between">
-            <span>Alojamiento</span>
-            <span>${precioBase}</span>
       <hr className="my-5" />
 
       {/* === SECCIÓN 2: Resumen === */}
@@ -200,15 +237,11 @@ function ReservaHabitacion() {
             variant="dark"
             size="lg"
             className="w-100 fw-bold"
-            onClick={handleConfirmarPago}
+            onClick={handleConfirmar}
           >
             CONFIRMAR PAGO
           </Button>
         </div>
-
-        <Button className="w-100 fw-bold" onClick={handleConfirmar}>
-          CONFIRMAR PAGO
-        </Button>
       </div>
     </Container>
   );
