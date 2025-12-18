@@ -28,7 +28,7 @@ function ReservaHabitacion() {
     const cargarDatos = async () => {
       try {
         const respuesta = await fetch(
-          `http://localhost:3000/api/habitaciones/${id}`
+          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${id}`
         );
         if (respuesta.ok) {
           const dato = await respuesta.json();
@@ -75,7 +75,7 @@ function ReservaHabitacion() {
         const habitacionActualizada = { ...habitacion, estado: "reservada" };
         
         const respuestaEstado = await fetch(
-          `http://localhost:3000/api/habitaciones/${id}`,
+          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${id}`,
           {
             method: "PUT",
             headers: {

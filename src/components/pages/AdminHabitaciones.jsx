@@ -26,7 +26,7 @@ const AdminHabitaciones = () => {
   // LEER (GET)
   const obtenerHabitaciones = async () => {
     try {
-      const respuesta = await fetch("http://localhost:3000/api/habitaciones");
+      const respuesta = await fetch("https://modulo-n-3-backend.vercel.app/api/habitaciones");
       const datos = await respuesta.json();
       setHabitaciones(datos);
     } catch (error) {

@@ -19,7 +19,7 @@ const Habitaciones = () => {
   // 3. FUNCIÓN PARA TRAER DATOS DEL BACKEND
   const obtenerHabitaciones = async () => {
     try {
-      const respuesta = await fetch("http://localhost:3000/api/habitaciones");
+      const respuesta = await fetch("https://modulo-n-3-backend.vercel.app/api/habitaciones");
       if (respuesta.ok) {
         const datos = await respuesta.json();
         setHabitaciones(datos); // Guardamos los datos de MongoDB

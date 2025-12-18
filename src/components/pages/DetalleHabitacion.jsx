@@ -20,7 +20,7 @@ const DetalleHabitacion = () => {
     const cargarDetalle = async () => {
       try {
         const respuesta = await fetch(
-          `http://localhost:3000/api/habitaciones/${id}`
+          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${id}`
         );
         if (respuesta.ok) {
           const dato = await respuesta.json();
