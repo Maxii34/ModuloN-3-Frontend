@@ -29,13 +29,8 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
         password: data.password,
         tipo: "usuario"
       };
-      
-      // 🔍 Para debugging (puedes comentarlo después)
-      console.log("Datos a enviar:", nuevoUsuario);
-      
+ 
       const respuesta = await registrarUsuario(nuevoUsuario);
-      
-      // ❌ PROBLEMA 1: Verificar que respuesta no sea null
       if (!respuesta) {
         return Swal.fire({
           title: "Error de conexión",
@@ -44,7 +39,6 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
         });
       }
 
-      // ❌ PROBLEMA 2: Si hay error, NO intentar parsear dos veces
       if (!respuesta.ok) {
         const datos = await respuesta.json();
         return Swal.fire({
@@ -54,10 +48,8 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
         });
       }
 
-      // ✅ Solo si todo salió bien
       const datos = await respuesta.json();
       
-      // Cerrar modal ANTES del Swal
       registerClose();
       reset();
       

@@ -266,7 +266,7 @@ function ReservaHabitacion() {
           </div>
 
           <Button
-            variant="primary"
+            variant="dark"
             size="lg"
             className="w-100 fw-bold"
             onClick={handleConfirmarPago}
