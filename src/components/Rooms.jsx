@@ -38,7 +38,7 @@ function Rooms() {
               <div className="room-content">
                 <h3 className="room-title">{room.title}</h3>
                 <p className="room-description">{room.description}</p>
-                <Link to="/habitaciones" className="room-link">Ver detalles</Link>
+                
               </div>
             </div>
           ))}

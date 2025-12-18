@@ -17,13 +17,13 @@ export const ContainerCard = () => {
     id: 2,
     nombre: "Mariano Juarez",
     imagen: Mariano,
-    github: "https://github.com/santyago13",
+    github: "https://github.com/cmjuarez95",
   },
   {
     id: 3,
     nombre: "Santiago Robledo",
     imagen: Santiago,
-    github: "https://github.com/SantiagoAnselmino",
+    github: "https://github.com/santyago13",
   },
   {
     id: 4,
