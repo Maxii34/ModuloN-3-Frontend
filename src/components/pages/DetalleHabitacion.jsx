@@ -9,8 +9,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 const DetalleHabitacion = () => {
   const { id } = useParams();
@@ -57,12 +56,12 @@ const DetalleHabitacion = () => {
 
   // --- CÁLCULOS DE PRECIO ---
   const precioBase = habitacion.precio;
-
-  // CAMBIO AQUÍ: Multiplicamos por 0.02 (que es el 2%)
-  const impuestos = precioBase * 0.02;
-
+  const impuestos = precioBase * 0.02; // 2%
   const total = precioBase + impuestos;
   // --------------------------
+
+  // Helper para saber si está disponible
+  const disponible = habitacion.estado === "disponible";
 
   return (
     <Container className="my-5">
@@ -133,7 +132,6 @@ const DetalleHabitacion = () => {
                 <Col className="text-end">${precioBase.toLocaleString()}</Col>
               </Row>
               <Row className="mb-3 text-muted">
-                {/* CAMBIO AQUÍ: Actualizamos el texto para que diga 2% */}
                 <Col>Impuestos y tasas (2%)</Col>
                 <Col className="text-end">${impuestos.toFixed(2)}</Col>
               </Row>
@@ -146,7 +144,7 @@ const DetalleHabitacion = () => {
               </Row>
             </div>
 
-            {habitacion.estado === "disponible" ? (
+            {disponible ? (
               <Alert variant="success" className="mt-2 text-center">
                 <i className="bi bi-check-circle-fill me-2"></i>
                 ¡Disponible para reservar!
@@ -159,28 +157,28 @@ const DetalleHabitacion = () => {
             )}
 
             <div className="d-grid gap-2 mt-3">
-              <Button
-                variant="primary"
-                size="lg"
-                disabled={habitacion.estado !== "disponible"}
-              >
-                Verificar Fechas
-              </Button>
-
-              {/* 2. ENVUELVE EL BOTÓN EN UN LINK */}
-              <Link
-                to={`/reserva/${habitacion._id || habitacion.id}`}
-                className="d-grid text-decoration-none"
-              >
+              {/* LÓGICA CORREGIDA: */}
+              {disponible ? (
+                /* CASO 1: DISPONIBLE (Botón dentro de Link) */
+                <Link
+                  to={`/reserva/${habitacion._id || habitacion.id}`}
+                  className="d-grid text-decoration-none"
+                >
+                  <Button variant="dark" size="lg" className="w-100">
+                    Continuar con la Reserva
+                  </Button>
+                </Link>
+              ) : (
+                /* CASO 2: NO DISPONIBLE (Solo botón disabled, sin Link) */
                 <Button
                   variant="dark"
                   size="lg"
-                  disabled={habitacion.estado !== "disponible"}
                   className="w-100"
+                  disabled={true}
                 >
                   Continuar con la Reserva
                 </Button>
-              </Link>
+              )}
             </div>
           </Card>
         </Col>

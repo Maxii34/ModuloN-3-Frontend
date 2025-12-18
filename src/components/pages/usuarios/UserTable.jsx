@@ -1,7 +1,7 @@
 import { Table } from "react-bootstrap";
 import UserRow from "./UserRow";
 
-const UserTable = ({ usuarios }) => {
+const UserTable = ({ usuarios, onUsuarioEliminado }) => {
   return (
     <Table hover responsive className="align-middle">
       <thead>
@@ -12,10 +12,13 @@ const UserTable = ({ usuarios }) => {
           <th className="text-center">Acciones</th>
         </tr>
       </thead>
-
       <tbody>
         {usuarios.map((u) => (
-          <UserRow key={u.id} usuario={u} />
+          <UserRow
+            key={u._id}
+            usuario={u}
+            onUsuarioEliminado={onUsuarioEliminado}
+          />
         ))}
       </tbody>
     </Table>

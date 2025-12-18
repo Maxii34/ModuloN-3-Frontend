@@ -7,12 +7,22 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { asignarHabitacionUsuario } from "../../services/usuariosAPI";
+import { useParams, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext";
 
 function ReservaHabitacion() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [habitacion, setHabitacion] = useState(null);
   const [cargando, setCargando] = useState(true);
+
+  // Obtener usuario para autocompletar
+  const { user } = useAuth();
+  const usuarioStorage =
+    JSON.parse(sessionStorage.getItem("usuarioKey"))?.usuario || {};
+  const usuarioActual = user || usuarioStorage;
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -25,7 +35,7 @@ function ReservaHabitacion() {
           setHabitacion(dato);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error al cargar habitación:", error);
       } finally {
         setCargando(false);
       }
@@ -33,10 +43,77 @@ function ReservaHabitacion() {
     cargarDatos();
   }, [id]);
 
+  const handleConfirmar = async () => {
+    try {
+      const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
+
+      if (!session || !session.token) {
+        throw new Error("Debes iniciar sesión para reservar");
+      }
+
+      // Pregunta de confirmación
+      const result = await Swal.fire({
+        title: "Confirmar Reserva",
+        text: `¿Estás seguro de reservar la habitación ${habitacion?.numero}?`,
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#0d6efd",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, pagar ahora",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (result.isConfirmed) {
+        // PASO 1: Asignar habitación al usuario (Lógica de tu compañero)
+        await asignarHabitacionUsuario(
+          session.usuario.id,
+          habitacion._id || habitacion.id,
+          session.token
+        );
+
+        // PASO 2: Cambiar el estado de la habitación a "reservada" (Tu lógica)
+        const habitacionActualizada = { ...habitacion, estado: "reservada" };
+        
+        const respuestaEstado = await fetch(
+          `http://localhost:3000/api/habitaciones/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "x-token": session.token, // Enviamos el token por seguridad
+            },
+            body: JSON.stringify(habitacionActualizada),
+          }
+        );
+
+        if (!respuestaEstado.ok) {
+           throw new Error("Se asignó el usuario, pero falló al actualizar el estado de la habitación.");
+        }
+
+        // Si todo salió bien:
+        Swal.fire({
+          icon: "success",
+          title: "Reserva confirmada",
+          text: "La habitación fue asignada y marcada como reservada correctamente.",
+        }).then(() => {
+           navigate("/");
+        });
+      }
+
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ocurrió un error al procesar la reserva",
+      });
+    }
+  };
+
   if (cargando) {
     return (
       <Container className="py-5 text-center">
-        <Spinner animation="border" variant="primary" />
+        <Spinner animation="border" />
         <p>Cargando datos de la reserva...</p>
       </Container>
     );
@@ -50,8 +127,7 @@ function ReservaHabitacion() {
     );
   }
 
-  // (2% Impuesto)
-  const precioBase = habitacion.precio;
+  const precioBase = habitacion.precio || 0;
   const impuestos = precioBase * 0.02;
   const total = precioBase + impuestos;
 
@@ -70,7 +146,13 @@ function ReservaHabitacion() {
             <Form.Label className="fw-normal text-muted">
               Nombre Completo
             </Form.Label>
-            <Form.Control type="text" placeholder="Tu Nombre" className="p-2" />
+            <Form.Control
+              type="text"
+              placeholder="Tu Nombre"
+              className="p-2"
+              defaultValue={usuarioActual.nombre}
+              readOnly
+            />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label className="fw-normal text-muted">
@@ -80,6 +162,8 @@ function ReservaHabitacion() {
               type="email"
               placeholder="ejemplo@correo.com"
               className="p-2"
+              defaultValue={usuarioActual.email}
+              readOnly
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -91,36 +175,17 @@ function ReservaHabitacion() {
             />
           </Form.Group>
         </Form>
+      </div>
 
-        <h3 className="mb-4 border-bottom pb-2 mt-5">2. Información de Pago</h3>
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-normal text-muted">
-              Número de Tarjeta
-            </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="XXXX XXXX XXXX XXXX"
-              className="p-2"
-            />
-          </Form.Group>
-          <div className="d-flex justify-content-between gap-3">
-            <Form.Group className="flex-grow-1">
-              <Form.Label className="fw-normal text-muted">
-                Vencimiento
-              </Form.Label>
-              <Form.Control type="text" placeholder="MM/AA" className="p-2" />
-            </Form.Group>
-            <Form.Group className="flex-grow-1">
-              <Form.Label className="fw-normal text-muted">CVC</Form.Label>
-              <Form.Control type="text" placeholder="123" className="p-2" />
-            </Form.Group>
-          </div>
-        </Form>
+      <div className="p-4 rounded border shadow-sm">
+        <h5 className="fw-bold">
+          {habitacion.tipo} – Habitación {habitacion.numero}
+        </h5>
       </div>
 
       <hr className="my-5" />
 
+      {/* === SECCIÓN 2: Resumen === */}
       <div className="p-4 rounded bg-white border shadow-sm">
         <div className="mb-4 border-bottom pb-3">
           <div
@@ -154,8 +219,8 @@ function ReservaHabitacion() {
             <span className="text-secondary">Alojamiento (1 Noche)</span>
             <span>${precioBase.toLocaleString()}</span>
           </ListGroup.Item>
-          <ListGroup.Item className="d-flex justify-content-between bg-white border-0 py-2">
-            <span className="text-secondary">Impuestos y Tasas (2%)</span>
+          <ListGroup.Item className="d-flex justify-content-between">
+            <span>Impuestos (2%)</span>
             <span>${impuestos.toFixed(2)}</span>
           </ListGroup.Item>
         </ListGroup>
@@ -168,7 +233,12 @@ function ReservaHabitacion() {
             </span>
           </div>
 
-          <Button variant="primary" size="lg" className="w-100 fw-bold">
+          <Button
+            variant="dark"
+            size="lg"
+            className="w-100 fw-bold"
+            onClick={handleConfirmar}
+          >
             CONFIRMAR PAGO
           </Button>
         </div>

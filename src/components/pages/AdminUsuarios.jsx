@@ -1,39 +1,31 @@
 import { Container, Row, Col, Form } from "react-bootstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserTable from "./usuarios/UserTable";
+import { listarUsuarios } from "../../services/usuariosAPI";
 
 const AdminUsuarios = () => {
-  const [usuarios] = useState([
-    {
-      id: 1,
-      nombre: "Ana",
-      apellido: "Torres",
-      email: "ana.torres@hotel.com",
-      tipo: "admin",
-      avatar: "https://i.pravatar.cc/150?img=47",
-    },
-    {
-      id: 2,
-      nombre: "Carlos",
-      apellido: "Gomez",
-      email: "carlos.gomez@hotel.com",
-      tipo: "usuario",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    },
-    {
-      id: 3,
-      nombre: "Luisa",
-      apellido: "Fernandez",
-      email: "luisa.fernandez@hotel.com",
-      tipo: "admin",
-      avatar: "https://i.pravatar.cc/150?img=32",
-    },
-  ]);
-
+  const [usuarios, setUsuarios] = useState([]);
   const [filtros, setFiltros] = useState({
     search: "",
     rol: "Todos",
   });
+
+  useEffect(() => {
+    cargarUsuarios();
+  }, []);
+
+  const cargarUsuarios = async () => {
+    try {
+      const data = await listarUsuarios();
+      setUsuarios(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUsuarioEliminado = (id) => {
+    setUsuarios((prev) => prev.filter((u) => u._id !== id));
+  };
 
   const usuariosFiltrados = usuarios.filter((u) => {
     const matchSearch =
@@ -49,21 +41,18 @@ const AdminUsuarios = () => {
 
   return (
     <Container className="p-4">
-      {/* HEADER */}
       <Row className="mb-4">
         <Col>
           <h2 className="fw-bold mb-1">Administración de Usuarios</h2>
           <p className="text-muted mb-0">
-            Controlá las reservas de tu hotel y los usuarios del sistema
+            Controlá los usuarios del sistema
           </p>
         </Col>
       </Row>
 
-      {/* FILTROS */}
       <Row className="mb-4 g-3">
         <Col md={6}>
           <Form.Control
-            type="text"
             placeholder="Buscar por nombre o email..."
             value={filtros.search}
             onChange={(e) =>
@@ -86,8 +75,10 @@ const AdminUsuarios = () => {
         </Col>
       </Row>
 
-      {/* TABLA */}
-      <UserTable usuarios={usuariosFiltrados} />
+      <UserTable
+        usuarios={usuariosFiltrados}
+        onUsuarioEliminado={handleUsuarioEliminado}
+      />
     </Container>
   );
 };

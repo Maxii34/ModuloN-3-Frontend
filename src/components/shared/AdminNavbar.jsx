@@ -1,10 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import "./AdminNavbar.css";
 import {
-  FaTh,
   FaBed,
   FaUsers,
-  FaCalendarAlt,
   FaSignOutAlt,
   FaShoppingBag,
 } from "react-icons/fa";
@@ -14,10 +12,8 @@ const AdminNavbar = ({ onLogout, setUsuarioLogueado }) => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { path: "/admin-dashboard", label: "Dashboard", icon: FaTh },
     { path: "/admin-habitaciones", label: "Habitaciones", icon: FaBed },
     { path: "/admin-usuarios", label: "Usuarios", icon: FaUsers },
-    { path: "/admin-reservas", label: "Reservas", icon: FaCalendarAlt },
   ];
 
   const handleLogout = () => {
@@ -33,9 +29,8 @@ const AdminNavbar = ({ onLogout, setUsuarioLogueado }) => {
     <nav className="admin-navbar">
       <div className="admin-navbar-header">
         <div className="admin-navbar-logo">
-          <FaShoppingBag className="logo-icon" />
+          <img src="/foto/LogoFinal.png" alt="" />
         </div>
-        <h1 className="admin-navbar-title">Sintax Hotel</h1>
         <p className="admin-navbar-subtitle">Admin Panel</p>
       </div>
 
