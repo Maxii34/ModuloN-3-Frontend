@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -64,6 +64,17 @@ const Menu = ({
               <Nav.Link as={Link} to="/habitaciones" className="nav-link">
                 Habitaciones
               </Nav.Link>
+
+              {/* 👇 NUEVO LINK: SOLO LOGUEADO */}
+              {estaLogueado && (
+                <Nav.Link
+                  as={Link}
+                  to="/mi-reserva"
+                  className="nav-link"
+                >
+                  Mi Reserva
+                </Nav.Link>
+              )}
               
             </Nav>
 
