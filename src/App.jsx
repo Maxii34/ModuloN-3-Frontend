@@ -19,6 +19,8 @@ import AdminUsuarios from "./components/pages/AdminUsuarios";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedAdminRoute from "./components/auth/ProtectedAdminRoute";
 import ProtectedUserRoute from "./components/auth/ProtectedUserRoute";
+import MiReserva from "./components/pages/MiReserva";
+
 
 function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
@@ -118,6 +120,8 @@ function AppRouter({
                     </ProtectedAdminRoute>
                   }
                 />
+                
+
                 <Route path="/*" element={<Error404 />} />
               </Routes>
             </main>
@@ -146,6 +150,15 @@ function AppRouter({
                   </ProtectedUserRoute>
                 }
               />
+
+               <Route
+                  path="/mi-reserva"
+                  element={
+                    <ProtectedUserRoute>
+                      <MiReserva />
+                    </ProtectedUserRoute>
+                  }
+                />
 
               <Route path="/nosotros" element={<QuienesSomos />} />
               <Route path="/galeria" element={<Galeria />} />

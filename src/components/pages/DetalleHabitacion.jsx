@@ -102,7 +102,7 @@ const DetalleHabitacion = () => {
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <i className="bi bi-aspect-ratio me-2"></i>
-                  <strong>Tamaño:</strong> {habitacion.metrosCuadrados} m²
+                  <strong>Tamaño:</strong> {habitacion.metros} m²
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <i className="bi bi-stars me-2"></i>
