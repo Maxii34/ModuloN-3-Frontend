@@ -42,7 +42,12 @@ export const ModalLogin = ({
 
         // Actualiza el estado local
         setUsuarioLogueado(usuarioData);
-        sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
+
+        // Guardar usuario
+        sessionStorage.setItem("usuarioKey", JSON.stringify(datos.usuario));
+
+        // Guardar token POR SEPARADO
+        sessionStorage.setItem("token", datos.token);
 
         // Actualiza el AuthContext según el tipo de usuario
         if (datos.usuario.tipo === "admin") {
