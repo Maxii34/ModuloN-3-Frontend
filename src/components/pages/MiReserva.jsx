@@ -51,7 +51,6 @@ const MiReserva = () => {
 
       if (!token) return;
 
-      // 1. Pregunta de confirmación
       const confirmacion = await Swal.fire({
         title: "¿Cancelar Reserva?",
         text: `¿Estás seguro que deseas cancelar la habitación ${numeroHabitacion}? Esta acción no se puede deshacer.`,
@@ -67,11 +66,8 @@ const MiReserva = () => {
         // Mostramos loading
         Swal.fire({ title: 'Cancelando...', didOpen: () => Swal.showLoading() });
 
-        // 2. Buscamos la habitación actual para tener sus datos viejos (si el backend lo exige)
-        // Nota: Si tu backend soporta PATCH o actualizaciones parciales, esto se puede simplificar.
         const habitacionActual = reservas.find(h => (h._id === idHabitacion) || (h.id === idHabitacion));
 
-        // 3. Petición al Backend (Liberar habitación)
         const response = await fetch(`${API_URL}/${idHabitacion}`, {
           method: "PUT",
           headers: {
@@ -79,14 +75,13 @@ const MiReserva = () => {
             "x-token": token,
           },
           body: JSON.stringify({
-            ...habitacionActual, // Mantenemos el resto de datos (precio, imagen, etc)
-            estado: "disponible", // Cambiamos estado
-            usuario: null         // ¡IMPORTANTE! Quitamos el dueño
+            ...habitacionActual, 
+            estado: "disponible", 
+            usuario: null         
           }),
         });
 
         if (response.ok) {
-          // 4. Actualizamos el estado LOCAL (Frontend) para que desaparezca la tarjeta
           setReservas(prevReservas => prevReservas.filter(h => (h._id !== idHabitacion) && (h.id !== idHabitacion)));
 
           await Swal.fire("Cancelada", "Tu reserva ha sido cancelada exitosamente.", "success");

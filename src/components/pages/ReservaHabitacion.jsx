@@ -79,16 +79,10 @@ function ReservaHabitacion() {
             didOpen: () => Swal.showLoading()
         });
 
-        // ---------------------------------------------------------
-        // CORRECCIÓN CRÍTICA AQUÍ ABAJO
-        // ---------------------------------------------------------
-        
-        // Creamos el objeto nuevo asegurando que TU ID viaja en él.
-        // Si no ponemos esto, la habitación se reserva "sin dueño".
         const habitacionActualizada = { 
             ...habitacion, 
             estado: "reservada",
-            usuario: miId // <--- ¡ESTO ES LO IMPORTANTE!
+            usuario: miId
         };
 
         const respuestaEstado = await fetch(
