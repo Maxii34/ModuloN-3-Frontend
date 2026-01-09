@@ -7,6 +7,7 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
+// Si no usas esta función, puedes borrar la importación, pero la dejo por si acaso.
 import { asignarHabitacionUsuario } from "../../services/usuariosAPI";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -26,13 +27,10 @@ function ReservaHabitacion() {
 
   const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
 
-
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        const respuesta = await fetch(
-          `${habitacionesBack}/${id}`
-        );
+        const respuesta = await fetch(`${habitacionesBack}/${id}`);
         if (respuesta.ok) {
           const dato = await respuesta.json();
           setHabitacion(dato);
@@ -44,21 +42,29 @@ function ReservaHabitacion() {
       }
     };
     cargarDatos();
-  }, [id]);
+  }, [id, habitacionesBack]);
 
   const handleConfirmar = async () => {
     try {
       const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
 
+      // Verificamos sesión
       if (!session || !session.token) {
-        throw new Error("Debes iniciar sesión para reservar");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Inicia Sesión',
+            text: 'Debes estar logueado para realizar una reserva.'
+        });
+        return;
       }
+
+      const miId = session.usuario.id || session.usuario._id;
 
       // Pregunta de confirmación
       const result = await Swal.fire({
         title: "Confirmar Reserva",
         text: `¿Estás seguro de reservar la habitación ${habitacion?.numero}?`,
-        icon: "info",
+        icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#0d6efd",
         cancelButtonColor: "#6c757d",
@@ -67,40 +73,43 @@ function ReservaHabitacion() {
       });
 
       if (result.isConfirmed) {
-        // PASO 1: Asignar habitación al usuario (Lógica de tu compañero)
-        await asignarHabitacionUsuario(
-          session.usuario.id,
-          habitacion._id || habitacion.id,
-          session.token
-        );
+        // Mostramos loading mientras procesa
+        Swal.fire({
+            title: 'Procesando...',
+            didOpen: () => Swal.showLoading()
+        });
 
-        // PASO 2: Cambiar el estado de la habitación a "reservada" (Tu lógica)
-        const habitacionActualizada = { ...habitacion, estado: "reservada" };
-        
+        const habitacionActualizada = { 
+            ...habitacion, 
+            estado: "reservada",
+            usuario: miId
+        };
+
         const respuestaEstado = await fetch(
           `${habitacionesBack}/${id}`,
           {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              "x-token": session.token, // Enviamos el token por seguridad
+              "x-token": session.token,
             },
             body: JSON.stringify(habitacionActualizada),
           }
         );
 
         if (!respuestaEstado.ok) {
-           throw new Error("Se asignó el usuario, pero falló al actualizar el estado de la habitación.");
+           throw new Error("Error al guardar la reserva en la base de datos.");
         }
 
         // Si todo salió bien:
-        Swal.fire({
+        await Swal.fire({
           icon: "success",
-          title: "Reserva confirmada",
-          text: "La habitación fue asignada y marcada como reservada correctamente.",
-        }).then(() => {
-           navigate("/");
+          title: "¡Reserva Exitosa!",
+          text: "La habitación ha sido asignada correctamente a tu cuenta.",
         });
+        
+        // Redirigimos a la página de inicio o a mis reservas
+        navigate("/");
       }
 
     } catch (error) {
