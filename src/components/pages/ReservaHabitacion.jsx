@@ -24,11 +24,14 @@ function ReservaHabitacion() {
     JSON.parse(sessionStorage.getItem("usuarioKey"))?.usuario || {};
   const usuarioActual = user || usuarioStorage;
 
+  const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
+
+
   useEffect(() => {
     const cargarDatos = async () => {
       try {
         const respuesta = await fetch(
-          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${id}`
+          `${habitacionesBack}/${id}`
         );
         if (respuesta.ok) {
           const dato = await respuesta.json();
@@ -75,7 +78,7 @@ function ReservaHabitacion() {
         const habitacionActualizada = { ...habitacion, estado: "reservada" };
         
         const respuestaEstado = await fetch(
-          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${id}`,
+          `${habitacionesBack}/${id}`,
           {
             method: "PUT",
             headers: {

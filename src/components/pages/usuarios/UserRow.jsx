@@ -45,13 +45,15 @@ const UserRow = ({ usuario, onUsuarioEliminado }) => {
     }
   };
 
+  const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
+
   const handleOpenModal = async () => {
     setShowModal(true);
 
     if (usuario.habitacionAsignada) {
       try {
         const resp = await fetch(
-          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${usuario.habitacionAsignada}`
+          `${habitacionesBack}/${usuario.habitacionAsignada}`
         );
         const data = await resp.json();
         setHabitacion(data);

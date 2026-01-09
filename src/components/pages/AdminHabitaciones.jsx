@@ -23,10 +23,13 @@ const AdminHabitaciones = () => {
   const [showModalEditar, setShowModalEditar] = useState(false);
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
 
+  const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
+
+
   // LEER (GET)
   const obtenerHabitaciones = async () => {
     try {
-      const respuesta = await fetch("https://modulo-n-3-backend.vercel.app/api/habitaciones");
+      const respuesta = await fetch(habitacionesBack);
       const datos = await respuesta.json();
       setHabitaciones(datos);
     } catch (error) {

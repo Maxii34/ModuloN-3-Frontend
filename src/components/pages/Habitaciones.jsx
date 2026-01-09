@@ -16,10 +16,12 @@ const Habitaciones = () => {
   // 2. ESTADO PARA LOS DATOS REALES (Empieza vacío)
   const [habitaciones, setHabitaciones] = useState([]);
 
+const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
+
   // 3. FUNCIÓN PARA TRAER DATOS DEL BACKEND
   const obtenerHabitaciones = async () => {
     try {
-      const respuesta = await fetch("https://modulo-n-3-backend.vercel.app/api/habitaciones");
+      const respuesta = await fetch(habitacionesBack);
       if (respuesta.ok) {
         const datos = await respuesta.json();
         setHabitaciones(datos); // Guardamos los datos de MongoDB
