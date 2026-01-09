@@ -200,19 +200,26 @@ export const ModalRegister = ({ showRegister, registerClose, loginShow }) => {
                     type="password"
                     placeholder="Ingresa tu contraseña"
                     {...register("password", {
-                      required: "El password es requerido",
+                      required: "La contraseña es obligatoria",
+                      minLength: {
+                        value: 8,
+                        message: "La contraseña debe tener al menos 8 caracteres",
+                      },
                       pattern: {
                         value:
                           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.])[A-Za-z\d@$!%*?&#.]{8,}$/,
-                        message: "El password no es válido",
+                        message: "La contraseña debe contener al menos: una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&#.)",
                       },
                     })}
                   />
                   {errors.password && (
-                    <span className="text-danger">
+                    <span className="text-danger small d-block mt-1">
                       {errors.password.message}
                     </span>
                   )}
+                  <Form.Text className="text-muted small d-block mt-1">
+                    <strong>Requisitos:</strong> Mínimo 8 caracteres, incluyendo al menos una mayúscula, una minúscula, un número y un símbolo especial (@$!%*?&#.)
+                  </Form.Text>
                 </Form.Group>
               </Col>
             </Row>
