@@ -1,25 +1,58 @@
-import { useState, useEffect } from "react"; // 1. Importamos useEffect
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Swal from "sweetalert2";
 import CardsHabitacionesPublic from "./habitaciones/CardsHabitacionesPublic";
+import "./BusquedaDisponibilidad.css";
 
 const Habitaciones = () => {
   // Estados de filtros visuales
   const [fechaEntrada, setFechaEntrada] = useState("");
   const [fechaSalida, setFechaSalida] = useState("");
-  const [huespedes, setHuespedes] = useState(1);
+  const [huespedes, setHuespedes] = useState(2);
   const [numHabitaciones, setNumHabitaciones] = useState(1);
+
+  // Obtener la fecha de hoy en formato YYYY-MM-DD para el input date
+  const today = new Date().toISOString().split('T')[0];
+
+  // Obtener la fecha mínima de salida (día siguiente a la llegada)
+  const getMinCheckOutDate = () => {
+    if (!fechaEntrada) return today;
+    
+    const checkIn = new Date(fechaEntrada);
+    checkIn.setDate(checkIn.getDate() + 1);
+    return checkIn.toISOString().split('T')[0];
+  };
+
+  // Manejar cambio en fecha de llegada
+  const handleFechaEntradaChange = (e) => {
+    const newFechaEntrada = e.target.value;
+    setFechaEntrada(newFechaEntrada);
+    
+    // Si la fecha de salida es anterior o igual a la nueva fecha de llegada, resetearla
+    if (fechaSalida && newFechaEntrada) {
+      const checkOut = new Date(fechaSalida);
+      const checkIn = new Date(newFechaEntrada);
+      if (checkOut <= checkIn) {
+        setFechaSalida('');
+      }
+    }
+  };
 
   // Estado para ordenar
   const [orden, setOrden] = useState("precio-asc");
 
   // 2. ESTADO PARA LOS DATOS REALES (Empieza vacío)
   const [habitaciones, setHabitaciones] = useState([]);
+  const [habitacionesFiltradas, setHabitacionesFiltradas] = useState([]);
+  const [busquedaRealizada, setBusquedaRealizada] = useState(false);
+
+const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
 
   // 3. FUNCIÓN PARA TRAER DATOS DEL BACKEND
   const obtenerHabitaciones = async () => {
     try {
-      const respuesta = await fetch("https://modulo-n-3-backend.vercel.app/api/habitaciones");
+      const respuesta = await fetch(habitacionesBack);
       if (respuesta.ok) {
         const datos = await respuesta.json();
         setHabitaciones(datos); // Guardamos los datos de MongoDB
@@ -35,6 +68,58 @@ const Habitaciones = () => {
   useEffect(() => {
     obtenerHabitaciones();
   }, []);
+
+  // Función para filtrar habitaciones según los criterios de búsqueda
+  const filtrarHabitaciones = () => {
+    // Validar que se hayan seleccionado fechas
+    if (!fechaEntrada || !fechaSalida) {
+      Swal.fire({
+        icon: "warning",
+        title: "Fechas requeridas",
+        text: "Por favor, selecciona las fechas de llegada y salida para realizar la búsqueda.",
+        confirmButtonText: "Entendido",
+      });
+      return;
+    }
+
+    // Filtrar habitaciones según los criterios
+    let habitacionesFiltradas = habitaciones.filter((hab) => {
+      // Filtrar por capacidad (huéspedes)
+      const cumpleCapacidad = hab.capacidad >= huespedes;
+      
+      // Filtrar por estado (solo disponibles)
+      const estaDisponible = hab.estado?.toLowerCase() === "disponible";
+      
+      return cumpleCapacidad && estaDisponible;
+    });
+
+    // Si se requieren múltiples habitaciones, verificar que haya suficientes disponibles
+    if (numHabitaciones > 1) {
+      // Si hay menos habitaciones disponibles que las requeridas, mostrar todas las disponibles
+      if (habitacionesFiltradas.length < numHabitaciones) {
+        Swal.fire({
+          icon: "info",
+          title: "Disponibilidad limitada",
+          text: `Solo encontramos ${habitacionesFiltradas.length} habitación(es) disponible(s) para ${huespedes} huésped(es).`,
+          confirmButtonText: "Entendido",
+        });
+      }
+    }
+
+    // Actualizar el estado de habitaciones filtradas
+    setHabitacionesFiltradas(habitacionesFiltradas);
+    setBusquedaRealizada(true);
+
+    // Mostrar mensaje si no hay resultados
+    if (habitacionesFiltradas.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "No se encontraron habitaciones",
+        text: `No hay habitaciones disponibles para ${huespedes} huésped(es) en las fechas seleccionadas. Intenta con otras fechas o número de huéspedes.`,
+        confirmButtonText: "Entendido",
+      });
+    }
+  };
 
   // Ordenador (Funciona igual, pero ahora con datos reales)
   const ordenarHabitaciones = (data) => {
@@ -63,60 +148,84 @@ const Habitaciones = () => {
         necesidades.
       </p>
 
-      {/* Filtros superiores */}
-      <Row className="bg-white p-4 rounded shadow-sm align-items-end g-3 mb-5">
-        <Col md={3}>
-          <Form.Group>
-            <Form.Label>Fecha de entrada</Form.Label>
-            <Form.Control
+      {/* Formulario de Búsqueda de Disponibilidad */}
+      <div className="busqueda-disponibilidad-form">
+        <div className="busqueda-form-group">
+          <label htmlFor="llegada">Llegada</label>
+          <div className="busqueda-input-wrapper">
+            <input
               type="date"
+              id="llegada"
               value={fechaEntrada}
-              onChange={(e) => setFechaEntrada(e.target.value)}
+              onChange={handleFechaEntradaChange}
+              min={today}
+              className="busqueda-form-input busqueda-date-input"
             />
-          </Form.Group>
-        </Col>
+            <i className="bi bi-calendar3 busqueda-input-icon"></i>
+          </div>
+        </div>
 
-        <Col md={3}>
-          <Form.Group>
-            <Form.Label>Fecha de salida</Form.Label>
-            <Form.Control
+        <div className="busqueda-form-group">
+          <label htmlFor="salida">Salida</label>
+          <div className="busqueda-input-wrapper">
+            <input
               type="date"
+              id="salida"
               value={fechaSalida}
               onChange={(e) => setFechaSalida(e.target.value)}
+              min={getMinCheckOutDate()}
+              disabled={!fechaEntrada}
+              className="busqueda-form-input busqueda-date-input"
             />
-          </Form.Group>
-        </Col>
+            <i className="bi bi-calendar3 busqueda-input-icon"></i>
+          </div>
+        </div>
 
-        <Col md={2}>
-          <Form.Group>
-            <Form.Label>Huéspedes</Form.Label>
-            <Form.Control
-              type="number"
-              min="1"
+        <div className="busqueda-form-group">
+          <label htmlFor="huespedes">Huéspedes</label>
+          <div className="busqueda-input-wrapper">
+            <select
+              id="huespedes"
               value={huespedes}
-              onChange={(e) => setHuespedes(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
+              onChange={(e) => setHuespedes(Number(e.target.value))}
+              className="busqueda-form-input"
+            >
+              <option value="1">1 Huésped</option>
+              <option value="2">2 Huéspedes</option>
+              <option value="3">3 Huéspedes</option>
+              <option value="4">4 Huéspedes</option>
+              <option value="5">5+ Huéspedes</option>
+            </select>
+            <i className="bi bi-chevron-down busqueda-input-icon"></i>
+          </div>
+        </div>
 
-        <Col md={2}>
-          <Form.Group>
-            <Form.Label>Habitaciones</Form.Label>
-            <Form.Control
-              type="number"
-              min="1"
+        <div className="busqueda-form-group">
+          <label htmlFor="habitaciones">Habitaciones</label>
+          <div className="busqueda-input-wrapper">
+            <select
+              id="habitaciones"
               value={numHabitaciones}
-              onChange={(e) => setNumHabitaciones(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
+              onChange={(e) => setNumHabitaciones(Number(e.target.value))}
+              className="busqueda-form-input"
+            >
+              <option value="1">1 Habitación</option>
+              <option value="2">2 Habitaciones</option>
+              <option value="3">3 Habitaciones</option>
+              <option value="4">4 Habitaciones</option>
+              <option value="5">5+ Habitaciones</option>
+            </select>
+            <i className="bi bi-chevron-down busqueda-input-icon"></i>
+          </div>
+        </div>
 
-        <Col md={2} className="text-center">
-          <Button variant="dark" className="w-100">
-            <i className="bi bi-search"></i> Buscar
-          </Button>
-        </Col>
-      </Row>
+        <button 
+          className="busqueda-button"
+          onClick={filtrarHabitaciones}
+        >
+          Ver Disponibilidad
+        </button>
+      </div>
 
       {/* Título + Ordenar */}
       <Row className="mb-4 align-items-center">
@@ -138,11 +247,34 @@ const Habitaciones = () => {
         </Col>
       </Row>
 
-      {/* Cards - Le pasamos el estado 'habitaciones' ordenado */}
+      {/* Cards - Mostramos habitaciones filtradas si hay búsqueda, sino todas */}
       {habitaciones.length > 0 ? (
-        <CardsHabitacionesPublic
-          habitaciones={ordenarHabitaciones(habitaciones)}
-        />
+        <>
+          {busquedaRealizada && habitacionesFiltradas.length === 0 ? (
+            <div className="text-center py-5">
+              <i className="bi bi-search fs-1 text-muted"></i>
+              <h4 className="mt-3 text-muted">No se encontraron resultados</h4>
+              <p className="text-muted">
+                No hay habitaciones disponibles con los criterios seleccionados.
+                <br />
+                Intenta ajustar las fechas o el número de huéspedes.
+              </p>
+            </div>
+          ) : (
+            <CardsHabitacionesPublic
+              habitaciones={ordenarHabitaciones(
+                busquedaRealizada ? habitacionesFiltradas : habitaciones
+              )}
+            />
+          )}
+          {busquedaRealizada && habitacionesFiltradas.length > 0 && (
+            <div className="text-center mt-3">
+              <p className="text-muted">
+                Se encontraron <strong>{habitacionesFiltradas.length}</strong> habitación(es) disponible(s)
+              </p>
+            </div>
+          )}
+        </>
       ) : (
         <div className="text-center py-5">
           <div className="spinner-border text-primary" role="status">

@@ -16,11 +16,14 @@ const DetalleHabitacion = () => {
   const [habitacion, setHabitacion] = useState(null);
   const [cargando, setCargando] = useState(true);
 
+  const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
+
+
   useEffect(() => {
     const cargarDetalle = async () => {
       try {
         const respuesta = await fetch(
-          `https://modulo-n-3-backend.vercel.app/api/habitaciones/${id}`
+          `${habitacionesBack}/${id}`
         );
         if (respuesta.ok) {
           const dato = await respuesta.json();
@@ -102,7 +105,7 @@ const DetalleHabitacion = () => {
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <i className="bi bi-aspect-ratio me-2"></i>
-                  <strong>Tamaño:</strong> {habitacion.metrosCuadrados} m²
+                  <strong>Tamaño:</strong> {habitacion.metros} m²
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <i className="bi bi-stars me-2"></i>
