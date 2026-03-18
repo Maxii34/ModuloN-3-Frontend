@@ -25,7 +25,6 @@ const AdminHabitaciones = () => {
 
   const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
 
-
   // LEER (GET)
   const obtenerHabitaciones = async () => {
     try {
@@ -75,7 +74,8 @@ const AdminHabitaciones = () => {
       }
 
       const respuesta = await crearHabitacion(habitacionNueva);
-      if (respuesta && respuesta.status === 201) {
+      
+      if (respuesta && (respuesta.status === 201 || respuesta.status === 200)) {
         Swal.fire({
           title: "¡Creada!",
           text: "La habitación se guardó correctamente",
@@ -84,9 +84,27 @@ const AdminHabitaciones = () => {
         reset();
         obtenerHabitaciones();
       } else if (respuesta) {
-        const mensaje = respuesta.datos?.mensaje || respuesta.datos?.msg || "No se pudo guardar la habitación";
+        // --- INICIO CÓDIGO MODIFICADO: Manejo de errores del backend ---
+        let mensaje = "No se pudo guardar la habitación";
+        
+        if (respuesta.datos) {
+          // Si el backend manda un array directo (ej: express-validator)
+          if (Array.isArray(respuesta.datos)) {
+            mensaje = respuesta.datos[0].msg || mensaje;
+          } 
+          // Si el backend manda un objeto con una propiedad 'errors' que es un array
+          else if (respuesta.datos.errors && Array.isArray(respuesta.datos.errors)) {
+            mensaje = respuesta.datos.errors[0].msg || mensaje;
+          } 
+          // Si es un mensaje simple
+          else {
+            mensaje = respuesta.datos.mensaje || respuesta.datos.msg || mensaje;
+          }
+        }
+
         console.error("Error al crear habitación:", respuesta.datos);
         Swal.fire("Error", mensaje, "error");
+        // --- FIN CÓDIGO MODIFICADO ---
       } else {
         Swal.fire("Error", "No se pudo guardar la habitación", "error");
       }
@@ -98,34 +116,34 @@ const AdminHabitaciones = () => {
 
   // BORRAR (DELETE)
   const borrarHabitacion = (id) => {
-  Swal.fire({
-    title: "¿Estás seguro?",
-    text: "¡No podrás revertir esto!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Sí, eliminar",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      const respuesta = await eliminarHabitacion(id);
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¡No podrás revertir esto!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const respuesta = await eliminarHabitacion(id);
 
-      if (respuesta && (respuesta.status === 200 || respuesta.ok)) {
-        // Actualizamos el estado local
-        setHabitaciones(
-          habitaciones.filter((hab) => (hab._id || hab.id) !== id)
-        );
-        Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
-      } else {
-        Swal.fire(
-          "Error", 
-          "No se pudo eliminar. Verifique si tiene permisos de administrador.", 
-          "error"
-        );
+        if (respuesta && (respuesta.status === 200 || respuesta.ok)) {
+          // Actualizamos el estado local
+          setHabitaciones(
+            habitaciones.filter((hab) => (hab._id || hab.id) !== id)
+          );
+          Swal.fire("¡Eliminado!", "La habitación fue eliminada.", "success");
+        } else {
+          Swal.fire(
+            "Error", 
+            "No se pudo eliminar. Verifique si tiene permisos de administrador.", 
+            "error"
+          );
+        }
       }
-    }
-  });
-};
+    });
+  };
 
   // LÓGICA DEL MODAL
   const handleEditarHabitacion = (habitacion) => {
@@ -144,6 +162,9 @@ const AdminHabitaciones = () => {
         <Col md={4} className="p-4 border rounded bg-light">
           <h3 className="mb-4 fw-bold">Agregar Nueva Habitación</h3>
           <Form onSubmit={handleSubmit(onSubmit)}>
+            
+            {/* ... (resto de los campos omitidos por brevedad, quedan igual) ... */}
+            
             <Form.Group className="mb-3">
               <Form.Label>Número</Form.Label>
               <Form.Control
@@ -261,16 +282,22 @@ const AdminHabitaciones = () => {
               )}
             </Form.Group>
 
+            {/* --- INICIO CÓDIGO MODIFICADO: Validación Visual --- */}
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
+                maxLength={250} // Límite físico en el HTML
                 {...register("descripcion", {
                   required: "La descripción es obligatoria",
                   minLength: {
                     value: 10,
                     message: "La descripción es muy corta",
+                  },
+                  maxLength: {
+                    value: 250, // Límite para react-hook-form
+                    message: "La descripción no puede superar los 250 caracteres",
                   },
                 })}
               />
@@ -280,6 +307,7 @@ const AdminHabitaciones = () => {
                 </span>
               )}
             </Form.Group>
+            {/* --- FIN CÓDIGO MODIFICADO --- */}
 
             <Form.Group className="mb-3">
               <Form.Label>Estado</Form.Label>
