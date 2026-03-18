@@ -1,27 +1,48 @@
-import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 export const Contacto = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const [mensajeExito, setMensajeExito] = useState(false);
+
+  const onSubmit = (data) => {
+    console.log("Formulario válido. Datos a enviar:", data);
+    setMensajeExito(true);
+    reset();
+    setTimeout(() => {
+      setMensajeExito(false);
+    }, 5000);
+  };
+
+  const validarEspacios = (value) => {
+    if (!value) return true;
+    return value.trim().length > 0 || "El campo no puede contener solo espacios";
+  };
+
   return (
     <Container className="my-5">
-      {/* Banner */}
       <div
-        className="p-4 p-md-5 mb-4 rounded shadow-sm border" // Añadimos 'shadow-sm' y 'border' para elegancia y definición
+        className="p-4 p-md-5 mb-4 rounded shadow-sm border"
         style={{
           backgroundColor: "white",
-          color: "#152945", // Color de texto oscuro para contraste con fondo blanco
+          color: "#152945",
         }}
       >
         <Row className="align-items-center">
-          {/* Sección Izquierda: Contáctanos */}
           <Col md={8}>
-            <h2 className="fw-bolder mb-3 text-primary">Contáctanos</h2>{" "}
-            {/* Usamos text-primary para destacar */}
+            <h2 className="fw-bolder mb-3 text-primary">Contáctanos</h2>
             <p className="mb-4 text-muted">
               Estamos aquí para ayudarte con reservas, eventos especiales o
               cualquier consulta sobre tu estancia en nuestro hotel.
             </p>
             <div className="d-flex flex-wrap gap-4">
-              {/* Mantengo el número de teléfono con el nuevo prefijo */}
               <p className="mb-0 fw-semibold text-secondary">
                 Teléfono:{" "}
                 <span className="text-decoration-underline text-dark">
@@ -31,10 +52,8 @@ export const Contacto = () => {
             </div>
           </Col>
 
-          {/* Sección Derecha: Atención Personalizada */}
           <Col
             md={4}
-            // Reducimos el margen superior en móvil, mantenemos el borde separador
             className="pt-4 pt-md-0 ps-md-5 border-start border-secondary border-opacity-25"
           >
             <h5 className="fw-bold mb-3 text-dark">Atención personalizada</h5>
@@ -54,9 +73,7 @@ export const Contacto = () => {
         </Row>
       </div>
 
-      {/* === 2. CONTENIDO PRINCIPAL: FORMULARIO E INFO === */}
       <Row className="g-4">
-        {/* --- Columna Izquierda: Formulario "Envíanos un Mensaje" --- */}
         <Col lg={7}>
           <Card className="shadow-sm border h-100">
             <Card.Body className="p-4 p-md-5">
@@ -65,8 +82,7 @@ export const Contacto = () => {
                 Cuéntanos qué necesitas y te responderemos lo antes posible.
               </p>
 
-              <Form>
-                {/* Nombre Completo */}
+              <Form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-semibold">
                     Nombre completo *
@@ -74,10 +90,27 @@ export const Contacto = () => {
                   <Form.Control
                     type="text"
                     placeholder="Escribe tu nombre y apellidos"
+                    className={errors.nombre ? "is-invalid" : ""}
+                    {...register("nombre", {
+                      required: "El nombre es obligatorio",
+                      minLength: {
+                        value: 3,
+                        message: "El nombre debe tener al menos 3 caracteres",
+                      },
+                      maxLength: {
+                        value: 50,
+                        message: "El nombre no puede superar los 50 caracteres",
+                      },
+                      validate: validarEspacios,
+                    })}
                   />
+                  {errors.nombre && (
+                    <Form.Text className="text-danger">
+                      {errors.nombre.message}
+                    </Form.Text>
+                  )}
                 </Form.Group>
 
-                {/* Email y Teléfono */}
                 <Row className="mb-3 g-3">
                   <Col md={6}>
                     <Form.Group>
@@ -85,44 +118,98 @@ export const Contacto = () => {
                       <Form.Control
                         type="email"
                         placeholder="tucorreo@ejemplo.com"
+                        className={errors.email ? "is-invalid" : ""}
+                        {...register("email", {
+                          required: "El correo electrónico es obligatorio",
+                          pattern: {
+                            value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                            message: "Ingresa un formato de correo válido (ej: usuario@mail.com)",
+                          },
+                        })}
                       />
+                      {errors.email && (
+                        <Form.Text className="text-danger">
+                          {errors.email.message}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group>
                       <Form.Label className="fw-semibold">Teléfono</Form.Label>
-                      <Form.Control type="tel" placeholder="+54" />
+                      <Form.Control
+                        type="tel"
+                        placeholder="+54"
+                        className={errors.telefono ? "is-invalid" : ""}
+                        {...register("telefono", {
+                          pattern: {
+                            value: /^[0-9+\-\s()]+$/,
+                            message: "Solo se permiten números y símbolos (+, -, ())",
+                          },
+                        })}
+                      />
+                      {errors.telefono && (
+                        <Form.Text className="text-danger">
+                          {errors.telefono.message}
+                        </Form.Text>
+                      )}
                     </Form.Group>
                   </Col>
                 </Row>
 
-                {/* Tipo de Consulta */}
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-semibold">
-                    Tipo de consulta
+                    Tipo de consulta *
                   </Form.Label>
-                  <Form.Select defaultValue="">
+                  <Form.Select
+                    defaultValue=""
+                    className={errors.tipoConsulta ? "is-invalid" : ""}
+                    {...register("tipoConsulta", {
+                      required: "Por favor, selecciona el tipo de consulta",
+                    })}
+                  >
                     <option value="" disabled>
                       Selecciona una opción
                     </option>
-                    <option>Reserva existente</option>
-                    <option>Nueva reserva</option>
-                    <option>Eventos y Grupos</option>
-                    <option>Información general</option>
+                    <option value="reserva-existente">Reserva existente</option>
+                    <option value="nueva-reserva">Nueva reserva</option>
+                    <option value="eventos">Eventos y Grupos</option>
+                    <option value="info">Información general</option>
                   </Form.Select>
+                  {errors.tipoConsulta && (
+                    <Form.Text className="text-danger">
+                      {errors.tipoConsulta.message}
+                    </Form.Text>
+                  )}
                 </Form.Group>
 
-                {/* Mensaje */}
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-semibold">Mensaje *</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
                     placeholder="Indícanos detalles de tu reserva, número de personas o cualquier petición especial."
+                    className={errors.mensaje ? "is-invalid" : ""}
+                    {...register("mensaje", {
+                      required: "El mensaje es obligatorio",
+                      minLength: {
+                        value: 10,
+                        message: "El mensaje debe tener al menos 10 caracteres",
+                      },
+                      maxLength: {
+                        value: 500,
+                        message: "El mensaje no puede superar los 500 caracteres",
+                      },
+                      validate: validarEspacios,
+                    })}
                   />
+                  {errors.mensaje && (
+                    <Form.Text className="text-danger">
+                      {errors.mensaje.message}
+                    </Form.Text>
+                  )}
                 </Form.Group>
 
-                {/* Botón de Envío */}
                 <Button
                   variant="primary"
                   type="submit"
@@ -132,42 +219,34 @@ export const Contacto = () => {
                 </Button>
               </Form>
 
-              {/* Mensaje de Éxito (solo maquetado, sin lógica) */}
-              <div
-                className="mt-4 p-2 text-center small"
-                style={{ backgroundColor: "#e9f7ef", color: "#155724" }}
-              >
-                Mensaje enviado correctamente. Gracias por contactar con
-                nosotros.
-              </div>
+              {mensajeExito && (
+                <Alert variant="success" className="mt-4 p-2 text-center small">
+                  Mensaje enviado correctamente. Gracias por contactar con nosotros.
+                </Alert>
+              )}
             </Card.Body>
           </Card>
         </Col>
 
-        {/* --- Columna Derecha: Información de Contacto --- */}
         <Col lg={5}>
           <Card className="shadow-sm border h-100 p-4">
             <Card.Body>
               <h4 className="fw-bold mb-4">Información de Contacto</h4>
 
               <div className="d-grid gap-3">
-                {/* Dirección */}
                 <div className="d-flex align-items-start">
                   <span className="me-3 fs-5" style={{ color: "#007bff" }}>
                     📍
                   </span>
                   <div>
                     <h6 className="mb-1 fw-semibold">Dirección</h6>
-                    <p className="mb-0 text-muted">
-                      Tucuman
-                    </p>
+                    <p className="mb-0 text-muted">Tucuman</p>
                     <a href="#" className="small">
                       Ver en mapa
                     </a>
                   </div>
                 </div>
 
-                {/* Teléfono y WhatsApp */}
                 <div className="d-flex align-items-start">
                   <span className="me-3 fs-5" style={{ color: "#007bff" }}>
                     📞
@@ -178,7 +257,6 @@ export const Contacto = () => {
                   </div>
                 </div>
 
-                {/* Email de Reservas */}
                 <div className="d-flex align-items-start">
                   <span className="me-3 fs-5" style={{ color: "#007bff" }}>
                     📧
@@ -189,7 +267,6 @@ export const Contacto = () => {
                   </div>
                 </div>
 
-                {/* Horario de Atención */}
                 <div className="d-flex align-items-start">
                   <span className="me-3 fs-5" style={{ color: "#007bff" }}>
                     🕒
@@ -206,7 +283,6 @@ export const Contacto = () => {
                 </div>
               </div>
 
-              {/* Mapa (Placeholder) */}
               <div
                 className="mt-4 border rounded overflow-hidden"
                 style={{ height: "200px", backgroundColor: "#f5f5f5" }}
