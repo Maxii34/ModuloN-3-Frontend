@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Button, Spinner, Badge } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"; // Importamos SweetAlert para la confirmación
 
 const MiReserva = () => {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // URL del Backend
-  const API_URL = import.meta.env.VITE_API_HABITACIONES || "https://modulo-n-3-backend.vercel.app/api/habitaciones";
+  const API_URL = import.meta.env.VITE_API_HABITACIONES;
 
   useEffect(() => {
     obtenerMisReservas();
@@ -17,10 +15,9 @@ const MiReserva = () => {
   const obtenerMisReservas = async () => {
     try {
       const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
-      const token = session?.token;
-      const miId = session?.usuario?._id || session?.usuario?.id;
+      const miId = String(session?.usuario?._id || session?.usuario?.id || "");
 
-      if (!token || !miId) {
+      if (!miId) {
         setLoading(false);
         return;
       }
@@ -29,147 +26,111 @@ const MiReserva = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const misHabitaciones = data.filter((h) => {
-          if (!h.usuario) return false;
-          return (h.usuario._id === miId) || (h.usuario === miId);
+        const misReservasPlanificadas = [];
+
+        data.forEach((habitacion) => {
+          habitacion.fechasOcupadas?.forEach((res) => {
+            const idEnReserva = String(res.usuario?._id || res.usuario || "");
+
+            if (idEnReserva === miId && miId !== "") {
+              misReservasPlanificadas.push({
+                ...habitacion, // Copiamos los datos de la habitación (imagen, numero)
+                reservaId: res._id, // EL ID ESPECÍFICO DE ESTA RESERVA (Para poder borrarla)
+                fechaEntrada: res.fechaEntrada,
+                fechaSalida: res.fechaSalida
+              });
+            }
+          });
         });
-        setReservas(misHabitaciones);
+        setReservas(misReservasPlanificadas);
       }
     } catch (error) {
-      console.error("Error:", error);
-      Swal.fire("Error", "No se pudieron cargar tus reservas", "error");
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  // --- FUNCIÓN PARA CANCELAR RESERVA ---
-  const handleCancelar = async (idHabitacion, numeroHabitacion) => {
-    try {
-      const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
-      const token = session?.token;
+  // --- NUEVA FUNCIÓN PARA CANCELAR ---
+  const handleCancelar = async (idHabitacion, reservaId) => {
+    const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
+    const token = session?.token || sessionStorage.getItem("token");
 
-      if (!token) return;
+    // 1. Pedimos confirmación al usuario
+    const confirmacion = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Se cancelará tu reserva y la habitación quedará libre.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, cancelar estancia",
+      cancelButtonText: "Volver"
+    });
 
-      const confirmacion = await Swal.fire({
-        title: "¿Cancelar Reserva?",
-        text: `¿Estás seguro que deseas cancelar la habitación ${numeroHabitacion}? Esta acción no se puede deshacer.`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Sí, cancelar",
-        cancelButtonText: "Mantener reserva"
-      });
-
-      if (confirmacion.isConfirmed) {
-        // Mostramos loading
-        Swal.fire({ title: 'Cancelando...', didOpen: () => Swal.showLoading() });
-
-        const habitacionActual = reservas.find(h => (h._id === idHabitacion) || (h.id === idHabitacion));
-
-        const response = await fetch(`${API_URL}/${idHabitacion}`, {
+    // 2. Si dice que sí, mandamos la petición al backend
+    if (confirmacion.isConfirmed) {
+      try {
+        const respuesta = await fetch(`${API_URL}/${idHabitacion}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "x-token": token,
+            "x-token": token // Mandamos el token de seguridad
           },
-          body: JSON.stringify({
-            ...habitacionActual, 
-            estado: "disponible", 
-            usuario: null         
-          }),
+          // Mandamos el ID de la reserva específica que queremos borrar
+          body: JSON.stringify({ cancelarReservaId: reservaId }) 
         });
 
-        if (response.ok) {
-          setReservas(prevReservas => prevReservas.filter(h => (h._id !== idHabitacion) && (h.id !== idHabitacion)));
-
-          await Swal.fire("Cancelada", "Tu reserva ha sido cancelada exitosamente.", "success");
+        if (respuesta.ok) {
+          Swal.fire("Cancelada", "Tu reserva ha sido cancelada con éxito.", "success");
+          
+          // 3. Actualizamos la pantalla (borramos la tarjeta sin tener que recargar la página)
+          setReservas((reservasAnteriores) => 
+            reservasAnteriores.filter((res) => res.reservaId !== reservaId)
+          );
         } else {
-          throw new Error("El servidor no pudo cancelar la reserva.");
+          Swal.fire("Error", "No se pudo cancelar la reserva", "error");
         }
+      } catch (error) {
+        console.error("Error al cancelar:", error);
+        Swal.fire("Error", "Fallo de conexión con el servidor", "error");
       }
-    } catch (error) {
-      console.error(error);
-      Swal.fire("Error", "Ocurrió un problema al intentar cancelar.", "error");
     }
   };
 
-  if (loading) {
-    return (
-      <Container className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
-        <Spinner animation="border" variant="primary" style={{ width: "3rem", height: "3rem" }} />
-      </Container>
-    );
-  }
+  if (loading) return <Container className="text-center py-5"><Spinner animation="border" variant="primary" /></Container>;
 
   return (
     <Container className="py-5">
-      <div className="text-center mb-5">
-        <h2 className="fw-bold display-6">Mis Estancias</h2>
-        <p className="text-secondary">Administra tus habitaciones reservadas</p>        
-      </div>
-
+      <h2 className="text-center mb-4 fw-bold">Mis Próximas Estancias</h2>
       {reservas.length === 0 ? (
-        <div className="text-center py-5 bg-light rounded-3 shadow-sm border border-dashed">
-          <div className="display-1 mb-3">🧳</div>
-          <h3 className="fw-bold text-muted">Aún no tienes reservas</h3>
-          <p className="mb-4">Parece que no has planificado tu próxima aventura con nosotros.</p>
-          <Link to="/habitaciones">
-            <Button variant="dark" size="lg" className="px-4 rounded">
-              Explorar Habitaciones
-            </Button>
-          </Link>
+        <div className="text-center p-5 border rounded bg-light">
+          <p className="text-muted fs-5">No tienes habitaciones reservadas actualmente.</p>
+          <Link to="/habitaciones"><Button variant="dark" className="px-4">Buscar Habitaciones</Button></Link>
         </div>
       ) : (
         <Row xs={1} md={2} lg={3} className="g-4">
-          {reservas.map((habitacion) => (
-            <Col key={habitacion._id || habitacion.id}>
-              <Card className="h-100 shadow border-0 overflow-hidden hover-effect">
-                <div style={{ height: "200px", overflow: "hidden", position: "relative" }}>
-                  <Card.Img
-                    variant="top"
-                    src={habitacion.imagen || "https://via.placeholder.com/600x400?text=Hotel"}
-                    className="h-100 w-100"
-                    style={{ objectFit: "cover" }}
-                    onError={(e) => { e.target.src = "https://via.placeholder.com/600x400?text=No+Image"; }}
-                  />
-                  <Badge 
-                    bg="success" 
-                    className="position-absolute top-0 end-0 m-3 py-2 px-3 shadow-sm"
-                  >
-                    Confirmada
-                  </Badge>
-                </div>
-
-                <Card.Body className="d-flex flex-column">
-                  <div className="d-flex justify-content-between align-items-start mb-2">
-                    <Card.Title className="fw-bold text-capitalize mb-0">
-                      {habitacion.tipo}
-                    </Card.Title>
-                    <span className="text-muted small">#{habitacion.numero}</span>
+          {reservas.map((res, i) => (
+            <Col key={i}>
+              <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <Card.Img src={res.imagen} style={{ height: "200px", objectFit: "cover" }} />
+                <Card.Body>
+                  <Card.Title className="fw-bold">Habitación {res.numero}</Card.Title>
+                  <Card.Text className="text-muted text-capitalize">{res.tipo}</Card.Text>
+                  <div className="p-3 bg-light rounded border mb-3 small text-dark">
+                    <strong>Check-in:</strong> {res.fechaEntrada}<br/>
+                    <strong>Check-out:</strong> {res.fechaSalida}
                   </div>
                   
-                  <Card.Text className="text-secondary small flex-grow-1">
-                    {habitacion.descripcion 
-                      ? habitacion.descripcion.substring(0, 80) + "..." 
-                      : "Habitación reservada."}
-                  </Card.Text>
+                  {/* --- BOTÓN CONECTADO A LA FUNCIÓN --- */}
+                  <Button 
+                    variant="outline-danger" 
+                    className="w-100 fw-bold"
+                    onClick={() => handleCancelar(res._id, res.reservaId)}
+                  >
+                    <i className="bi bi-x-circle me-2"></i>Cancelar Reserva
+                  </Button>
 
-                  <div className="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
-                    <span className="fw-bold text-primary fs-5">
-                        ${habitacion.precio?.toLocaleString()}
-                    </span>
-                    
-                    {/* BOTÓN DE CANCELAR */}
-                    <Button 
-                        variant="danger" 
-                        size="sm"
-                        onClick={() => handleCancelar(habitacion._id || habitacion.id, habitacion.numero)}
-                    >
-                      Cancelar Reserva
-                    </Button>
-                  </div>
                 </Card.Body>
               </Card>
             </Col>
