@@ -76,12 +76,30 @@ const ModalEditarHabitacion = ({
         reset(); // Limpia el formulario
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error capturado al editar:", error);
+      
+      // --- INICIO CÓDIGO MODIFICADO: Captura inteligente del error del backend ---
+      let mensaje = "No se pudo actualizar. Revisa la conexión o tus permisos.";
+
+      // Buscamos la respuesta del backend (suele venir en error.response.data si usas Axios, o directamente en el error)
+      const dataError = error.response?.data || error.datos || error;
+
+      if (dataError) {
+        if (Array.isArray(dataError)) {
+          mensaje = dataError[0].msg || mensaje;
+        } else if (dataError.errors && Array.isArray(dataError.errors)) {
+          mensaje = dataError.errors[0].msg || mensaje;
+        } else if (dataError.mensaje || dataError.msg) {
+          mensaje = dataError.mensaje || dataError.msg;
+        }
+      }
+
       Swal.fire({
-        title: "Error",
-        text: "No se pudo actualizar. Revisa la conexión o tus permisos.",
+        title: "Error de Validación",
+        text: mensaje,
         icon: "error",
       });
+      // --- FIN CÓDIGO MODIFICADO ---
     }
   };
 
@@ -133,14 +151,20 @@ const ModalEditarHabitacion = ({
             <Form.Text className="text-danger">{errors.capacidad?.message}</Form.Text>
           </Form.Group>
 
+          {/* --- INICIO CÓDIGO MODIFICADO: Límite del Piso --- */}
           <Form.Group className="mb-3">
             <Form.Label>Piso</Form.Label>
             <Form.Control
               type="number"
-              {...register("piso", { required: "Piso obligatorio" })}
+              {...register("piso", { 
+                required: "Piso obligatorio",
+                min: { value: 0, message: "El piso no puede ser negativo" },
+                max: { value: 15, message: "El piso debe estar entre 0 y 15" } // Validación de límite máximo
+              })}
             />
             <Form.Text className="text-danger">{errors.piso?.message}</Form.Text>
           </Form.Group>
+          {/* --- FIN CÓDIGO MODIFICADO --- */}
 
           <Form.Group className="mb-3">
             <Form.Label>Metros Cuadrados</Form.Label>
@@ -170,8 +194,14 @@ const ModalEditarHabitacion = ({
             <Form.Control
               as="textarea"
               rows={3}
-              {...register("descripcion", { required: true })}
+              // También le agregué el maxLength aquí por consistencia con tu otro archivo
+              maxLength={250}
+              {...register("descripcion", { 
+                required: true,
+                maxLength: { value: 250, message: "La descripción no puede superar los 250 caracteres" } 
+              })}
             />
+            <Form.Text className="text-danger">{errors.descripcion?.message}</Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
