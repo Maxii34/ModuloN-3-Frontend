@@ -1,7 +1,7 @@
 import { Button, Modal, Form } from "react-bootstrap";
 import "./Modales.css";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { iniciarSesion } from "../helpers/queries";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext"; 
@@ -34,6 +34,7 @@ export const ModalLogin = ({
       if (respuesta && respuesta.status === 200) {
         const datos = await respuesta.json();
 
+        // --- LA CORRECCIÓN LÓGICA ESTÁ AQUÍ ---
         const usuarioData = {
           usuario: datos.usuario,
           token: datos.token,
@@ -43,10 +44,8 @@ export const ModalLogin = ({
         // Actualiza el estado local
         setUsuarioLogueado(usuarioData);
 
-        // Guardar usuario
-        sessionStorage.setItem("usuarioKey", JSON.stringify(datos.usuario));
-
-        // Guardar token POR SEPARADO
+        // Guardamos el objeto COMPLETO bajo una sola llave para que MiReserva lo encuentre
+        sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioData));
         sessionStorage.setItem("token", datos.token);
 
         // Actualiza el AuthContext según el tipo de usuario
