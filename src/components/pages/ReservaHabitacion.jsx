@@ -6,9 +6,9 @@ import {
   ListGroup,
   Spinner,
   Alert,
+  Row,
+  Col
 } from "react-bootstrap";
-// Si no usas esta función, puedes borrar la importación, pero la dejo por si acaso.
-import { asignarHabitacionUsuario } from "../../services/usuariosAPI";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
@@ -19,12 +19,14 @@ function ReservaHabitacion() {
   const [habitacion, setHabitacion] = useState(null);
   const [cargando, setCargando] = useState(true);
 
-  // Obtener usuario para autocompletar
+  const [fechaEntrada, setFechaEntrada] = useState("");
+  const [fechaSalida, setFechaSalida] = useState("");
+
   const { user } = useAuth();
-  const usuarioStorage =
-    JSON.parse(sessionStorage.getItem("usuarioKey"))?.usuario || {};
+  const usuarioStorage = JSON.parse(sessionStorage.getItem("usuarioKey"))?.usuario || {};
   const usuarioActual = user || usuarioStorage;
 
+  // Usamos solo la API de habitaciones que ya está en el deploy
   const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
 
   useEffect(() => {
@@ -45,215 +47,142 @@ function ReservaHabitacion() {
   }, [id, habitacionesBack]);
 
   const handleConfirmar = async () => {
+    if (!fechaEntrada || !fechaSalida) {
+      Swal.fire("Atención", "Debes seleccionar las fechas de entrada y salida", "warning");
+      return;
+    }
+
     try {
       const session = JSON.parse(sessionStorage.getItem("usuarioKey"));
-
-      // Verificamos sesión
       if (!session || !session.token) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Inicia Sesión',
-            text: 'Debes estar logueado para realizar una reserva.'
-        });
+        Swal.fire("Inicia Sesión", "Debes estar logueado para reservar.", "warning");
         return;
       }
 
-      const miId = session.usuario.id || session.usuario._id;
-
-      // Pregunta de confirmación
       const result = await Swal.fire({
         title: "Confirmar Reserva",
-        text: `¿Estás seguro de reservar la habitación ${habitacion?.numero}?`,
+        text: `¿Deseas reservar la habitación ${habitacion?.numero} desde el ${fechaEntrada} al ${fechaSalida}?`,
         icon: "question",
         showCancelButton: true,
-        confirmButtonColor: "#0d6efd",
-        cancelButtonColor: "#6c757d",
-        confirmButtonText: "Sí, pagar ahora",
+        confirmButtonText: "Sí, reservar",
         cancelButtonText: "Cancelar",
       });
 
       if (result.isConfirmed) {
-        // Mostramos loading mientras procesa
         Swal.fire({
-            title: 'Procesando...',
-            didOpen: () => Swal.showLoading()
+          title: 'Verificando disponibilidad...',
+          didOpen: () => Swal.showLoading()
         });
 
-        const habitacionActualizada = { 
-            ...habitacion, 
-            estado: "reservada",
-            usuario: miId
+        // ESTRATEGIA: Mandamos un "reservaNueva" dentro del PUT de la habitación
+        const reservaBody = {
+          reservaNueva: {
+            fechaEntrada,
+            fechaSalida,
+            usuario: usuarioActual.id || usuarioActual._id
+          }
         };
 
-        const respuestaEstado = await fetch(
-          `${habitacionesBack}/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "x-token": session.token,
-            },
-            body: JSON.stringify(habitacionActualizada),
-          }
-        );
-
-        if (!respuestaEstado.ok) {
-           throw new Error("Error al guardar la reserva en la base de datos.");
-        }
-
-        // Si todo salió bien:
-        await Swal.fire({
-          icon: "success",
-          title: "¡Reserva Exitosa!",
-          text: "La habitación ha sido asignada correctamente a tu cuenta.",
+        const respuesta = await fetch(`${habitacionesBack}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "x-token": session.token,
+          },
+          body: JSON.stringify(reservaBody),
         });
-        
-        // Redirigimos a la página de inicio o a mis reservas
-        navigate("/");
-      }
 
+        const data = await respuesta.json();
+
+        if (respuesta.ok) {
+          await Swal.fire({
+            icon: "success",
+            title: "¡Reserva Exitosa!",
+            text: "Tu estancia ha sido programada correctamente.",
+          });
+          navigate("/"); // O la ruta que prefieras
+        } else {
+          // Captura el mensaje de "La habitación ya está ocupada" del backend
+          throw new Error(data.mensaje || "Error al procesar la reserva");
+        }
+      }
     } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Ocurrió un error al procesar la reserva",
-      });
+      Swal.fire("Error", error.message, "error");
     }
   };
 
-  if (cargando) {
-    return (
-      <Container className="py-5 text-center">
-        <Spinner animation="border" />
-        <p>Cargando datos de la reserva...</p>
-      </Container>
-    );
-  }
+  if (cargando) return <Container className="py-5 text-center"><Spinner animation="border" /></Container>;
 
-  if (!habitacion) {
-    return (
-      <Container className="py-5">
-        <Alert variant="danger">Habitación no encontrada</Alert>
-      </Container>
-    );
-  }
-
-  const precioBase = habitacion.precio || 0;
+  const precioBase = habitacion?.precio || 0;
   const impuestos = precioBase * 0.02;
   const total = precioBase + impuestos;
 
   return (
     <Container className="py-5" style={{ maxWidth: "650px" }}>
-      <h1 className="mb-1 fw-bold text-center">Checkout de Reserva</h1>
-      <p className="text-secondary text-center mb-5">
-        Completa tu información para asegurar tu habitación.
-      </p>
+      <h1 className="mb-1 fw-bold text-center">Finalizar Reserva</h1>
+      
+      <div className="p-4 mb-4 bg-white border rounded shadow-sm">
+        <h3 className="mb-3 border-bottom pb-2">1. Fechas de Estancia</h3>
+        <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Check-in</Form.Label>
+              <Form.Control 
+                type="date" 
+                value={fechaEntrada} 
+                min={new Date().toISOString().split("T")[0]} // No dejar elegir fechas pasadas
+                onChange={(e) => setFechaEntrada(e.target.value)} 
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Check-out</Form.Label>
+              <Form.Control 
+                type="date" 
+                value={fechaSalida} 
+                min={fechaEntrada || new Date().toISOString().split("T")[0]}
+                onChange={(e) => setFechaSalida(e.target.value)} 
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+      </div>
 
-      {/* === SECCIÓN 1: Formulario === */}
       <div className="p-4 mb-4 bg-light rounded shadow-sm">
-        <h3 className="mb-3 border-bottom pb-2">1. Tu Contacto</h3>
+        <h3 className="mb-3 border-bottom pb-2">2. Datos del Huésped</h3>
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label className="fw-normal text-muted">
-              Nombre Completo
-            </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Tu Nombre"
-              className="p-2"
-              defaultValue={usuarioActual.nombre}
-              readOnly
-            />
+            <Form.Label className="text-muted">Nombre</Form.Label>
+            <Form.Control type="text" defaultValue={usuarioActual.nombre} readOnly />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label className="fw-normal text-muted">
-              Correo Electrónico
-            </Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="ejemplo@correo.com"
-              className="p-2"
-              defaultValue={usuarioActual.email}
-              readOnly
-            />
-          </Form.Group>
-          <Form.Group className="mb-4">
-            <Form.Label className="fw-normal text-muted">Teléfono</Form.Label>
-            <Form.Control
-              type="tel"
-              placeholder="+XX XXX XXX XXXX"
-              className="p-2"
-            />
+            <Form.Label className="text-muted">Email</Form.Label>
+            <Form.Control type="email" defaultValue={usuarioActual.email} readOnly />
           </Form.Group>
         </Form>
       </div>
 
-      <div className="p-4 rounded border shadow-sm">
-        <h5 className="fw-bold">
-          {habitacion.tipo} – Habitación {habitacion.numero}
-        </h5>
-      </div>
-
-      <hr className="my-5" />
-
-      {/* === SECCIÓN 2: Resumen === */}
       <div className="p-4 rounded bg-white border shadow-sm">
-        <div className="mb-4 border-bottom pb-3">
-          <div
-            className="w-100 mb-2 rounded overflow-hidden"
-            style={{ maxHeight: "150px" }}
-          >
-            <img
-              src={
-                habitacion.imagenes ||
-                habitacion.imagen ||
-                "https://via.placeholder.com/800x400"
-              }
-              alt={habitacion.tipo}
-              className="w-100 h-100"
-              style={{ objectFit: "cover" }}
-              onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/800x400?text=Sin+Imagen";
-              }}
-            />
-          </div>
-          <h5 className="fw-bold mt-2 text-capitalize">
-            {habitacion.tipo} - Habitación {habitacion.numero}
-          </h5>
-        </div>
-
-        <h4 className="mb-3">Desglose de Costos</h4>
-
+        <h4 className="mb-3">Resumen del Pago</h4>
         <ListGroup variant="flush" className="mb-4">
-          <ListGroup.Item className="d-flex justify-content-between bg-white border-0 py-2">
-            <span className="text-secondary">Alojamiento (1 Noche)</span>
+          <ListGroup.Item className="d-flex justify-content-between">
+            <span>Habitación {habitacion.numero} ({habitacion.tipo})</span>
             <span>${precioBase.toLocaleString()}</span>
           </ListGroup.Item>
           <ListGroup.Item className="d-flex justify-content-between">
-            <span>Impuestos (2%)</span>
+            <span>Tasa de servicio (2%)</span>
             <span>${impuestos.toFixed(2)}</span>
+          </ListGroup.Item>
+          <ListGroup.Item className="d-flex justify-content-between fw-bold">
+            <span>TOTAL:</span>
+            <span className="text-primary">${total.toLocaleString()}</span>
           </ListGroup.Item>
         </ListGroup>
 
-        <div className="pt-3 border-top mt-4">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <span className="h5 fw-bold text-dark">TOTAL FINAL:</span>
-            <span className="h4 fw-bold text-primary">
-              ${total.toLocaleString()}
-            </span>
-          </div>
-
-          <Button
-            variant="dark"
-            size="lg"
-            className="w-100 fw-bold"
-            onClick={handleConfirmar}
-          >
-            CONFIRMAR PAGO
-          </Button>
-        </div>
+        <Button variant="primary" size="lg" className="w-100 fw-bold" onClick={handleConfirmar}>
+          CONFIRMAR Y PAGAR
+        </Button>
       </div>
     </Container>
   );

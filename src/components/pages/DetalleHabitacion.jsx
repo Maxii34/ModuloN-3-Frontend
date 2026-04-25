@@ -5,7 +5,6 @@ import {
   Card,
   Button,
   ListGroup,
-  Alert,
   Spinner,
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
@@ -18,13 +17,10 @@ const DetalleHabitacion = () => {
 
   const habitacionesBack = import.meta.env.VITE_API_HABITACIONES;
 
-
   useEffect(() => {
     const cargarDetalle = async () => {
       try {
-        const respuesta = await fetch(
-          `${habitacionesBack}/${id}`
-        );
+        const respuesta = await fetch(`${habitacionesBack}/${id}`);
         if (respuesta.ok) {
           const dato = await respuesta.json();
           setHabitacion(dato);
@@ -39,7 +35,7 @@ const DetalleHabitacion = () => {
     };
 
     cargarDetalle();
-  }, [id]);
+  }, [id, habitacionesBack]);
 
   if (cargando) {
     return (
@@ -62,9 +58,6 @@ const DetalleHabitacion = () => {
   const impuestos = precioBase * 0.02; // 2%
   const total = precioBase + impuestos;
   // --------------------------
-
-  // Helper para saber si está disponible
-  const disponible = habitacion.estado === "disponible";
 
   return (
     <Container className="my-5">
@@ -113,7 +106,7 @@ const DetalleHabitacion = () => {
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <i className="bi bi-info-circle me-2"></i>
-                  <strong>Estado:</strong>
+                  <strong>Estado General:</strong>
                   <span className="ms-1 text-capitalize">
                     {habitacion.estado}
                   </span>
@@ -147,42 +140,21 @@ const DetalleHabitacion = () => {
               </Row>
             </div>
 
-            {disponible ? (
-              <Alert variant="success" className="mt-2 text-center">
-                <i className="bi bi-check-circle-fill me-2"></i>
-                ¡Disponible para reservar!
-              </Alert>
-            ) : (
-              <Alert variant="warning" className="mt-2 text-center">
-                <i className="bi bi-exclamation-circle-fill me-2"></i>
-                Esta habitación figura como: {habitacion.estado}
-              </Alert>
-            )}
-
-            <div className="d-grid gap-2 mt-3">
-              {/* LÓGICA CORREGIDA: */}
-              {disponible ? (
-                /* CASO 1: DISPONIBLE (Botón dentro de Link) */
-                <Link
-                  to={`/reserva/${habitacion._id || habitacion.id}`}
-                  className="d-grid text-decoration-none"
-                >
-                  <Button variant="dark" size="lg" className="w-100">
-                    Continuar con la Reserva
-                  </Button>
-                </Link>
-              ) : (
-                /* CASO 2: NO DISPONIBLE (Solo botón disabled, sin Link) */
-                <Button
-                  variant="dark"
-                  size="lg"
-                  className="w-100"
-                  disabled={true}
-                >
+            <div className="d-grid gap-2 mt-4">
+              {/* LÓGICA CORREGIDA: El botón SIEMPRE está activo para permitir verificar fechas */}
+              <Link
+                to={`/reserva/${habitacion._id || habitacion.id}`}
+                className="d-grid text-decoration-none"
+              >
+                <Button variant="dark" size="lg" className="w-100">
                   Continuar con la Reserva
                 </Button>
-              )}
+              </Link>
             </div>
+            
+            <p className="text-muted text-center small mt-3">
+              Podrás verificar la disponibilidad exacta de tus fechas en el siguiente paso.
+            </p>
           </Card>
         </Col>
       </Row>
