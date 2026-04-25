@@ -13,7 +13,7 @@ export const Contacto = () => {
   const [mensajeExito, setMensajeExito] = useState(false);
 
   const onSubmit = (data) => {
-    console.log("Formulario válido. Datos a enviar:", data);
+    // console.log eliminado para no exponer datos sensibles en el cliente
     setMensajeExito(true);
     reset();
     setTimeout(() => {
